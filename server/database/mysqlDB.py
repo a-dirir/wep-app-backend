@@ -1,7 +1,6 @@
 import os
 from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import DeclarativeBase
-from server.services.iam.models.iam_models import *
 
 
 class Base(DeclarativeBase):

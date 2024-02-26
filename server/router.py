@@ -1,9 +1,9 @@
 import logging
 from sqlalchemy.orm import Session
+
+from server.services.customers.service import Customers
 from server.services.iam.service import IAM
-from server.services.opsnow.service import OPSNOW
-from server.services.monitoring.service import Monitoring
-from server.services.iam.models.iam_models import *
+from server.services.iam.models.iam_models import UserModel, GroupModel, APIKeyModel, PolicyModel
 
 
 
@@ -11,8 +11,7 @@ class Router:
     def __init__(self):
         self.services = {
             'IAM': IAM(),
-            'OPSNOW': OPSNOW(),
-            'Monitoring': Monitoring()
+            'Customers': Customers(),
         }
         self.users = {}
         self.groups = {}
