@@ -1,103 +1,8 @@
-from server.services.iam.models.iam_models import PolicyModel
-from sqlalchemy.orm import Session
 
 
 class Policy:
     def __init__(self):
-        pass
-
-    def createPolicy(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
-
-        # add validation
-
-        data['expanded_policy'] = Policy._expandPolicy(data['policy'])
-
-        with Session(db.engine) as session:
-            try:
-                policy = PolicyModel(
-                    name=data['name'],
-                    description=data['description'],
-                    policy=data['policy'],
-                    expanded_policy=data['expanded_policy']
-                )
-
-                session.add(policy)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to create Policy'}, 400
-
-
-        return {}, 200
-
-    def getPolicy(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
-
-        # add validation
-
-        with Session(db.engine) as session:
-            try:
-                policy = session.query(PolicyModel).filter_by(name=data['name']).first().to_dict()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get Policy'}, 400
-
-        return policy, 200
-
-    def getPolicies(self, payload: dict):
-        db = payload['db']
-
-        with Session(db.engine) as session:
-            try:
-                policies = session.query(PolicyModel).all()
-                policies = [policy.to_dict() for policy in policies]
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get Policies'}, 400
-
-        return policies, 200
-
-    def updatePolicy(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
-
-        # add validation
-
-        data['expanded_policy'] = self._expandPolicy(data['policy'])
-
-        with Session(db.engine) as session:
-            try:
-                policy = session.query(PolicyModel).filter_by(name=data['name']).first()
-                policy.description = data['description']
-                policy.policy = data['policy']
-                policy.expanded_policy = data['expanded_policy']
-
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to update Policy'}, 400
-
-        return {}, 200
-
-    def deletePolicy(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
-
-        # add validation
-
-        with Session(db.engine) as session:
-            try:
-                policy = session.query(PolicyModel).filter_by(name=data['name']).first()
-                session.delete(policy)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to delete Policy'}, 400
-
-        return {}, 200
+        self.table_name = 'iam_policies'
 
     @staticmethod
     def _expandPolicy(policy: dict):
@@ -149,6 +54,82 @@ class Policy:
 
 
         return expanded_policy
+
+    def create(self, payload: dict):
+        data = payload['data']
+        db = payload['db']
+
+        # add validation
+
+        data['expanded_policy'] = Policy._expandPolicy(data['policy'])
+
+        # insert row into table
+        success, results = db.insert_row(table_name=self.table_name, row=data)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def get(self, payload: dict):
+        data = payload['data']
+        db = payload['db']
+
+        # add validation
+
+        # get row from table
+        conditions = {'name': data['name']}
+        success, results = db.get_row(table_name=self.table_name, where_items=conditions)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def list(self, payload: dict):
+        db = payload['db']
+
+        # get all rows from table
+        success, results = db.get_rows(table_name=self.table_name)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def update(self, payload: dict):
+        data = payload['data']
+        db = payload['db']
+
+        # add validation
+
+        data['expanded_policy'] = self._expandPolicy(data['policy'])
+
+        # update row in table
+        conditions = {'name': data['name']}
+        data.pop('name')
+        success, results = db.update_row(table_name=self.table_name, row=data, where_items=conditions)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def delete(self, payload: dict):
+        data = payload['data']
+        db = payload['db']
+
+        # add validation
+
+        # delete row from table
+        conditions = {'name': data['name']}
+        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
 
 
 

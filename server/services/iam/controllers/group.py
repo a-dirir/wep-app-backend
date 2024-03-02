@@ -1,100 +1,87 @@
-from server.services.iam.models.iam_models import GroupModel
-from sqlalchemy.orm import Session
 
 
 class Group:
     def __init__(self):
-        pass
+        self.table_name = 'iam_groups'
 
-    def createGroup(self, payload: dict):
+    def create(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                group = GroupModel(
-                    name=data['name'],
-                    description=data['description'],
-                    policy=data['policy']
-                )
+        row = {
+            'name': data['name'],
+            'description': data['description'],
+            'policy': data['policy']
+        }
 
-                session.add(group)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to create Group'}, 400
+        # insert row into table
+        success, results = db.insert_row(table_name=self.table_name, row=row)
 
+        if not success:
+            return {'error': results}, 400
 
-        return {}, 200
+        return row, 200
 
-    def getGroup(self, payload: dict):
+    def get(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                group = session.query(GroupModel).filter_by(name=data['name']).first().to_dict()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get Group'}, 400
+        # get row from table
+        conditions = {'name': data['name']}
+        success, results = db.get_row(table_name=self.table_name, where_items=conditions)
 
+        if not success:
+            return {'error': results}, 400
 
-        return group, 200
+        return results, 200
 
-    def getGroups(self, payload: dict):
+    def list(self, payload: dict):
         db = payload['db']
 
-        with Session(db.engine) as session:
-            try:
-                groups = session.query(GroupModel).all()
-                groups = [group.to_dict() for group in groups]
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get Groups'}, 400
+        # get all rows from table
+        success, results = db.get_rows(table_name=self.table_name)
 
-        return groups, 200
+        if not success:
+            return {'error': results}, 400
 
-    def updateGroup(self, payload: dict):
+        return results, 200
+
+    def update(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                group = session.query(GroupModel).filter_by(name=data['name']).first()
+        # update row in table
+        conditions = {'name': data['name']}
+        data.pop('name')
+        success, results = db.update_row(table_name=self.table_name, row=data, where_items=conditions)
 
-                group.description = data['description']
-                group.policy = data['policy']
+        if not success:
+            return {'error': results}, 400
 
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to update Group'}, 400
+        return results, 200
 
-        return {}, 200
-
-    def deleteGroup(self, payload: dict):
+    def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                group = session.query(GroupModel).filter_by(name=data['name']).first()
+        # delete row from table
+        conditions = {'name': data['name']}
+        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
 
-                session.delete(group)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to delete Group'}, 400
+        if not success:
+            return {'error': results}, 400
 
-        return {}, 200
+        return results, 200
+
+
 
 
 

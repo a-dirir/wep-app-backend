@@ -1,96 +1,81 @@
-from server.services.iam.models.iam_models import UserModel
-from sqlalchemy.orm import Session
 
 
 class User:
     def __init__(self):
-        pass
+        self.table_name = 'iam_users'
 
-    def createUser(self, payload: dict):
+    def create(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                user = UserModel(
-                    email=data['email'],
-                    name=data['name'],
-                    group=data['group']
-                )
+        # insert row into table
+        success, results = db.insert_row(table_name=self.table_name, row=data)
 
-                session.add(user)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to create User'}, 400
+        if not success:
+            return {'error': results}, 400
 
-        return {}, 200
+        return results, 200
 
-    def getUser(self, payload: dict):
+    def get(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                user = session.query(UserModel).filter_by(email=data['email']).first().to_dict()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get User'}, 400
-        
-        return user, 200
+        # get row from table
+        conditions = {'email': data['email']}
+        success, results = db.get_row(table_name=self.table_name, where_items=conditions)
 
-    def getUsers(self, payload: dict):
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def list(self, payload: dict):
         db = payload['db']
 
-        with Session(db.engine) as session:
-            try:
-                users = session.query(UserModel).all()
-                users = [user.to_dict() for user in users]
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to get Users'}, 400
+        # add validation
 
-        return users, 200
+        # get all rows from table
+        success, results = db.get_rows(table_name=self.table_name)
 
-    def updateUser(self, payload: dict):
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def update(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                user = session.query(UserModel).filter_by(email=data['email']).first()
-                user.name = data['name']
-                user.group = data['group']
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to update User'}, 400
+        # update row in table
+        conditions = {'email': data['email']}
+        data.pop('email')
+        success, results = db.update_row(table_name=self.table_name, row=data, where_items=conditions)
 
+        if not success:
+            return {'error': results}, 400
 
-        return {}, 200
+        return results, 200
 
-    def deleteUser(self, payload: dict):
+    def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
 
-        with Session(db.engine) as session:
-            try:
-                user = session.query(UserModel).filter_by(email=data['email']).first()
-                session.delete(user)
-                session.commit()
-            except Exception as e:
-                print(e)
-                return {'error': 'Failed to delete User'}, 400
-        
-        return {}, 200
+        # delete row from table
+        conditions = {'email': data['email']}
+        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
+
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
 
 
 

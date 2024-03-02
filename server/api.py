@@ -6,13 +6,18 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 
 from server.router import Router
-from server.database.mysqlDB import MySQLDB
+from server.database.mysql_db import MySQLDB
 
 
 class Server:
     def __init__(self):
-        self.db = MySQLDB()
-        self.db.create_tables()
+        self.db = MySQLDB(
+            host=os.getenv("MYSQL_IP"),
+            user=os.getenv("MYSQL_User"),
+            password=os.getenv("MYSQL_Password"),
+            database=os.getenv("MYSQL_Name")
+        )
+
 
         self.app = Flask(__name__)
         cors = CORS(self.app)

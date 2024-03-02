@@ -1,9 +1,7 @@
-
 from server.services.iam.controllers.user import User
 from server.services.iam.controllers.group import Group
 from server.services.iam.controllers.policy import Policy
 from server.services.iam.controllers.api_keys import ApiKey
-from server.services.iam.controllers.customer import Customer
 
 
 class IAM:
@@ -14,8 +12,7 @@ class IAM:
             'User': User(),
             'Group': Group(),
             'Policy': Policy(),
-            'ApiKey': ApiKey(),
-            'Customer': Customer()
+            'ApiKey': ApiKey()
         }
 
     def handle(self, payload: dict, handler: str, method: str):
