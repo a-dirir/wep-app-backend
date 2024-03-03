@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/contact.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/csv-plugin.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/web_app.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/simple_crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

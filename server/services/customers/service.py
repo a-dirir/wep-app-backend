@@ -1,6 +1,5 @@
 from server.services.customers.controllers.simple_crud import SimpleCRUD
 from server.services.customers.controllers.client import Client
-from server.services.customers.controllers.sub_client import SubClient
 from server.services.customers.controllers.contact import Contact
 
 
@@ -10,7 +9,7 @@ class Customers:
 
         self.handlers = {
             'Client': Client('clients'),
-            'SubClient': SubClient('sub_clients'),
+            'SubClient': Client('sub_clients'),
             'Contact': Contact('clients_contacts'),
             'Synthetic': SimpleCRUD('clients_url'),
 

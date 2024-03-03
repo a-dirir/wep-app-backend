@@ -87,6 +87,17 @@ class Client:
         data = payload['data']
         db = payload['db']
 
+        # check if Name is missing
+        if data.get('Name') is None:
+            return {'error': 'Name is missing'}, 400
+
+        # check if Name is at least 5 characters long
+        if len(data['Name']) < 5:
+            return {'error': 'Name is too short'}, 400
+
+        # generate Client_ID from by getting first 5 letters from and Name, - and last 4 letters from the Name
+        data[self.primary_key] = data['Name'][:5] + '-' + data['Name'][-4:]
+
         # validate row
         success, message = self.validate_row(data, db)
         if not success:
