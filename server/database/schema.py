@@ -68,6 +68,7 @@ schema = {
             },
             "group": {
               "type": "VARCHAR(64)",
+              "foreign_key": "iam_groups.name",
               "unique": True,
               "not_null": True
             }
@@ -86,6 +87,7 @@ schema = {
             },
             "policy": {
               "type": "VARCHAR(64)",
+              "foreign_key": "iam_policies.name",
               "unique": True,
               "not_null": True
             }

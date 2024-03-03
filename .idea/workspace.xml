@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/contact.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/csv-plugin.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/web_app.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/simple_crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="2cunzydu8ixG9uoYSzAJnlXeCwe" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/services/customers/controllers"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\customers\controllers" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="" />
+      <created>1708970597472</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1708970597472</updated>
+    </task>
+    <servers />
+  </component>
+</project>

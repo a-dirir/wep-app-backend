@@ -1,23 +1,30 @@
-# from server.services.customers.controllers.addon import Addon
-# from server.services.customers.controllers.aws_account import AwsAccount
-# from server.services.customers.controllers.aws_opportunity import AwsOpportunity
-# from server.services.customers.controllers.azure_account import AzureAccount
-# from server.services.customers.controllers.azure_opportunity import AzureOpportunity
-# from server.services.customers.controllers.client import Client
-# from server.services.customers.controllers.contacts import Contact
-# from server.services.customers.controllers.m365_account import M365Account
-# from server.services.customers.controllers.m365_opportunity import M365Opportunity
-# from server.services.customers.controllers.opportunity import Opportunity
-# from server.services.customers.controllers.product import Product
-# from server.services.customers.controllers.sub_client import SubClient
-# from server.services.customers.controllers.crud import Synthetic
-#
+from server.services.customers.controllers.simple_crud import SimpleCRUD
+from server.services.customers.controllers.client import Client
+from server.services.customers.controllers.sub_client import SubClient
+from server.services.customers.controllers.contact import Contact
+
 
 class Customers:
     def __init__(self):
         self.name = 'Customers'
 
         self.handlers = {
+            'Client': Client('clients'),
+            'SubClient': SubClient('sub_clients'),
+            'Contact': Contact('clients_contacts'),
+            'Synthetic': SimpleCRUD('clients_url'),
+
+            'AwsAccount': SimpleCRUD('aws_accounts'),
+            'AzureAccount': SimpleCRUD('azure_accounts'),
+            'M365Account': SimpleCRUD('m365_accounts'),
+
+            'Opportunity': SimpleCRUD('opportunities'),
+            'AwsOpportunity': SimpleCRUD('aws_opportunity_details'),
+            'AzureOpportunity': SimpleCRUD('azure_opportunity_details'),
+            'M365Opportunity': SimpleCRUD('m365_opportunity_details'),
+
+            'Addon': SimpleCRUD('addons'),
+            'Product': SimpleCRUD('products'),
         }
 
     def handle(self, payload: dict, handler: str, method: str):
