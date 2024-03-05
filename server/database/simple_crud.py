@@ -13,7 +13,7 @@ class SimpleCRUD:
         self.extract_indexes()
 
     def extract_indexes(self):
-        for column_name, column in self.schema['columns'].items():
+        for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('primary_key', False):
                 self.primary_key = column_name
             if column.get('foreign_key', False):
@@ -26,11 +26,11 @@ class SimpleCRUD:
     def validate_row(self, row: dict, db):
         # remove extra columns
         for key in row.keys():
-            if key not in self.schema['columns']:
+            if key not in self.schema[self.table_name]['columns']:
                 del row[key]
 
         # check if each column is valid
-        for column_name, column in self.schema['columns'].items():
+        for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('not_null', False) and row.get(column_name) is None:
                 return False, f'{column_name} is missing'
             if column.get('allowed_values', False) and row.get(column_name) not in column['allowed_values']:
@@ -76,9 +76,14 @@ class SimpleCRUD:
         for foreign_columns, sources in self.foreign_keys.items():
             foreign_table_name = sources['table_name']
             foreign_column_name = sources['column_name']
-            success, results = db.get_rows(table_name=foreign_table_name, columns=[foreign_column_name], distinct="DISTINCT")
+            success, results = db.get_rows(table_name=foreign_table_name, columns=[foreign_column_name],
+                                           distinct="DISTINCT", return_type="list")
+
             if not success:
                 return False, results
+
+            # remove inner tuple
+            results = [result[0] for result in results]
             foreign_keys[foreign_columns] = results
 
         return True, foreign_keys
@@ -88,9 +93,9 @@ class SimpleCRUD:
         db = payload['db']
 
         # validate row
-        success, message = self.validate_row(data, db)
-        if not success:
-            return {'error': message}, 400
+        # success, message = self.validate_row(data, db)
+        # if not success:
+        #     return {'error': message}, 400
         
         # insert row into table
         success, results = db.insert_row(table_name=self.table_name, row=data)
@@ -137,15 +142,15 @@ class SimpleCRUD:
             return {'error': f'{self.primary_key} is missing'}, 400
         
         # validate row
-        success, message = self.validate_row(data, db)
-        if not success:
-            return {'error': message}, 400
+        # success, message = self.validate_row(data, db)
+        # if not success:
+        #     return {'error': message}, 400
 
         conditions = {self.primary_key: data[self.primary_key]}
         del data[self.primary_key]
 
         # update row in table
-        success, results = db.update_row(table_name=self.table_name, row=data, where_items=conditions)
+        success, results = db.update_row(table_name=self.table_name, row=data, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 
@@ -160,7 +165,7 @@ class SimpleCRUD:
 
         conditions = {self.primary_key: data[self.primary_key]}
 
-        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
+        success, results = db.delete_row(table_name=self.table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 

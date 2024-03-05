@@ -32,31 +32,35 @@ class MySQLDB:
         return where_clause
 
     @staticmethod
-    def convert_results_to_dict(table_name: str, rows: list):
-        columns = schema[table_name]['columns']
+    def convert_results_to_dict(rows: list, columns: list = None):
         result = []
         for row in rows:
             row_dict = {}
             for i in range(len(columns)):
-                row_dict[list(columns.keys())[i]] = row[i]
+                row_dict[columns[i]] = row[i]
             result.append(row_dict)
-
         return result
 
-    def get_rows(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = ""):
+    def get_rows(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = "", return_type: str = "dict"):
         try:
             if columns is None:
-                columns = ['*']
-            columns = ", ".join(columns)
-            sql = f"SELECT {distinct} {columns} FROM {table_name}"
+                columns = list(schema[table_name]['columns'].keys())
+            columns_str = ", ".join(columns)
+            sql = f"SELECT {distinct} {columns_str} FROM {table_name}"
             if where_items is not None:
                 where_clause = self.generate_where_clause(where_items)
                 sql = f"{sql} WHERE {where_clause}"
+
             mycursor = self.mydb.cursor()
             mycursor.execute(sql)
-            results = self.convert_results_to_dict(table_name, mycursor.fetchall())
 
-            return True, results
+            if return_type == "list":
+                return True, mycursor.fetchall()
+            elif return_type == "dict":
+                results = self.convert_results_to_dict(mycursor.fetchall(), columns)
+                return True, results
+            else:
+                return False, "Invalid return_type"
         except Exception as e:
             return False, f"Error fetching rows from Table ({table_name})\n{e}"
 

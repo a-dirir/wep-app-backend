@@ -13,7 +13,7 @@ class Contact:
         self.extract_indexes()
 
     def extract_indexes(self):
-        for column_name, column in self.schema['columns'].items():
+        for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('primary_key', False):
                 self.primary_key = column_name
             if column.get('foreign_key', False):
@@ -30,7 +30,7 @@ class Contact:
                 del row[key]
 
         # check if each column is valid
-        for column_name, column in self.schema['columns'].items():
+        for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('not_null', False) and row.get(column_name) is None:
                 return False, f'{column_name} is missing'
             if column.get('allowed_values', False) and row.get(column_name) not in column['allowed_values']:

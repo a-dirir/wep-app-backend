@@ -1,4 +1,4 @@
-from server.services.iam.controllers.user import User
+from server.database.simple_crud import SimpleCRUD
 from server.services.iam.controllers.group import Group
 from server.services.iam.controllers.policy import Policy
 from server.services.iam.controllers.api_keys import ApiKey
@@ -9,9 +9,9 @@ class IAM:
         self.name = 'IAM'
 
         self.handlers = {
-            'User': User(),
-            'Group': Group(),
-            'Policy': Policy(),
+            'User': SimpleCRUD(table_name='iam_users'),
+            'Group': SimpleCRUD(table_name='iam_groups'),
+            'Policy': SimpleCRUD(table_name='iam_policies'),
             'ApiKey': ApiKey()
         }
 
