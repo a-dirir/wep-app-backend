@@ -159,7 +159,7 @@ class SimpleCRUD:
     def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
-
+        print(data)
         if data.get(self.primary_key) is None:
             return {'error': f'{self.primary_key} is missing'}, 400
 

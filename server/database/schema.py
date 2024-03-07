@@ -365,6 +365,7 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
+                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
                 "not_null": True
             },
@@ -389,6 +390,7 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
+                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
                 "not_null": True
             },
@@ -413,6 +415,7 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
+                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
                 "not_null": True
             },
