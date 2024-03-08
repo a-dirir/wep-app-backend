@@ -1,8 +1,22 @@
+from server.database.schema import schema
 
 
 class Policy:
     def __init__(self):
         self.table_name = 'iam_policies'
+        self.schema = schema
+
+    def validate_data(self, row: dict):
+        # remove extra columns
+        for key in row.keys():
+            if key not in self.schema[self.table_name]['columns']:
+                del row[key]
+
+        for column_name, column in self.schema[self.table_name]['columns'].items():
+            if column.get('not_null', False) and row.get(column_name) is None:
+                return False, f'{column_name} is missing'
+
+        return True, row
 
     @staticmethod
     def _expandPolicy(policy: dict):
@@ -59,7 +73,10 @@ class Policy:
         data = payload['data']
         db = payload['db']
 
-        # add validation
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
 
         data['expanded_policy'] = Policy._expandPolicy(data['policy'])
 
@@ -71,11 +88,14 @@ class Policy:
 
         return results, 200
 
-    def get(self, payload: dict):
+    def read(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        # add validation
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
 
         # get row from table
         conditions = {'name': data['name']}
@@ -90,7 +110,7 @@ class Policy:
         db = payload['db']
 
         # get all rows from table
-        success, results = db.get_rows(table_name=self.table_name)
+        success, results = db.get_rows(table_name=self.table_name, columns=['name', 'description', 'policy'])
 
         if not success:
             return {'error': results}, 400
@@ -101,7 +121,10 @@ class Policy:
         data = payload['data']
         db = payload['db']
 
-        # add validation
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
 
         data['expanded_policy'] = self._expandPolicy(data['policy'])
 
@@ -119,7 +142,10 @@ class Policy:
         data = payload['data']
         db = payload['db']
 
-        # add validation
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
 
         # delete row from table
         conditions = {'name': data['name']}

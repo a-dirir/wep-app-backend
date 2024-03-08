@@ -6,6 +6,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 
 from server.router import Router
+from server.authenticator import Authenticator
 from server.database.mysql_db import MySQLDB
 
 
@@ -18,24 +19,25 @@ class Server:
             database=os.getenv("MYSQL_Name")
         )
 
-
         self.app = Flask(__name__)
         cors = CORS(self.app)
         self.router = Router()
+        self.authenticator = Authenticator(self.db)
+
         self.routes()
         self.app.run(host="0.0.0.0", port=os.getenv("API_Server_Port"))
 
     def routes(self):
         @self.app.route('/', methods=['POST'])
         def app():
-            # get user email from request header
+            # get user credentials from request header
             user_id = request.headers.get('user-id')
+            user_password = request.headers.get('user-password')
             user_type = request.headers.get('user-type')
-
-            user = {'id': user_id, 'type': user_type}
-
-            # TODO: Add authentication for the user or API key
-            pass
+            user = {'id': user_id, 'type': user_type, 'secret': user_password}
+            # check if user credentials are valid
+            if not self.authenticator.authenticate(user):
+                return jsonify(msg='Authentication failed'), 400
 
             # load json data from request
             request_msg: dict = request.get_json()

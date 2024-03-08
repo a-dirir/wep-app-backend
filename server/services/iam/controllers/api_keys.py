@@ -8,7 +8,7 @@ class ApiKey:
         self.table_name = 'iam_api_keys'
 
     @staticmethod
-    def generateApiKey():
+    def generateCredentials():
         # generate a random string of length 32bytes for the key id
         key_id = os.urandom(32).hex()
         # generate the salt
@@ -28,9 +28,11 @@ class ApiKey:
         if user['type'] != 'user':
             return {'error': 'Only users can create api keys'}, 400
 
-        key_id, salt, key_value_row, key_value_hashed = self.generateApiKey()
+        key_id, salt, key_value_row, key_value_hashed = self.generateCredentials()
 
         # add validation
+        if data.get('key_group') is None or data.get('key_rate_limit') is None:
+            return {'error': 'Missing required fields'}, 400
 
         # insert row into table
         row = {
@@ -48,13 +50,20 @@ class ApiKey:
         if not success:
             return {'error': results}, 400
 
-        return row, 200
+        credentials = {
+            'key_id': key_id,
+            'key_value': key_value_row
+        }
 
-    def get(self, payload: dict):
+        return credentials, 200
+
+    def read(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
+        if data.get('key_id') is None:
+            return {'error': 'Missing required fields'}, 400
 
         # get row from table
         conditions = {'key_id': data['key_id']}
@@ -74,11 +83,20 @@ class ApiKey:
         if not success:
             return {'error': results}, 400
 
+        # remove the password_hashed and salt from the results
+        for user in results:
+            user.pop('key_value')
+            user.pop('key_salt')
+
+        return results, 200
+
     def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
         # add validation
+        if data.get('key_id') is None:
+            return {'error': 'Missing required fields'}, 400
 
         # delete row from table
         conditions = {'key_id': data['key_id']}
@@ -94,18 +112,25 @@ class ApiKey:
         db = payload['db']
 
         # add validation
+        if data.get('key_id') is None or data.get('key_value') is None:
+            return {'error': 'Missing required fields'}, 400
 
         try:
             success, apikey = db.get_row(table_name=self.table_name, where_items={'key_id': data['key_id']})
+            if not success:
+                return {'error': apikey}, 400
+
             # hash the key value with the salt
-            key_value_hashed = hashlib.pbkdf2_hmac('sha256', data['key_value'].encode('utf-8'), apikey.key_salt.encode('utf-8'), 100000).hex()
-            if key_value_hashed == apikey.key_value:
+            key_value_hashed = hashlib.pbkdf2_hmac('sha256', data['key_value'].encode('utf-8'),
+                                                   apikey['key_salt'].encode('utf-8'), 100000).hex()
+
+            if key_value_hashed == apikey['key_value']:
                 success, results = db.update_row(table_name=self.table_name, row={'key_last_time_used': datetime.now().strftime("%m/%d/%Y %H:%M:%S")},
                                                  where_items={'key_id': data['key_id']})
                 if not success:
                     return {'error': results}, 400
 
-                return {'message': 'Api key validated'}, 200
+                return True, 200
             else:
                 return {'error': 'Invalid api key'}, 400
         except Exception as e:

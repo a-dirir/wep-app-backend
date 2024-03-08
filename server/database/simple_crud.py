@@ -23,53 +23,59 @@ class SimpleCRUD:
                     'column_name': foreign_column_name
                 }
 
-    def validate_row(self, row: dict, db):
+    def validate_data(self, row: dict, db):
         # remove extra columns
         for key in row.keys():
             if key not in self.schema[self.table_name]['columns']:
                 del row[key]
 
-        # check if each column is valid
         for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('not_null', False) and row.get(column_name) is None:
                 return False, f'{column_name} is missing'
-            if column.get('allowed_values', False) and row.get(column_name) not in column['allowed_values']:
-                return False, f'{column_name} is invalid'
-            if column.get('type', False) and row.get(column_name) is not None:
-                if column['type'] == 'INT' and not row[column_name].isdigit():
-                    return False, f'{column_name} is invalid'
-                if column['type'] == 'VARCHAR' and len(row[column_name]) > int(column['type'][8:-1]):
-                    return False, f'{column_name} is invalid'
-                if column['type'] == 'DATETIME':
-                    try:
-                        datetime.strptime(row[column_name], '%Y-%m-%d %H:%M:%S')
-                    except ValueError:
-                        return False, f'{column_name} is invalid'
-                if column['type'] == 'DATE':
-                    try:
-                        datetime.strptime(row[column_name], '%Y-%m-%d')
-                    except ValueError:
-                        return False, f'{column_name} is invalid'
-                    
-            if column.get('foreign_key', False) and row.get(column_name) is not None:
-                foreign_table_name = self.foreign_keys[column_name]['table_name']
-                foreign_column_name = self.foreign_keys[column_name]['column_name']
-                conditions = {foreign_column_name: row[column_name]}
-                success, results = db.get_rows(table_name=foreign_table_name, where_items=conditions)
-                if not success:
-                    return False, results
-                if len(results) == 0:
-                    return False, f'{column_name} is invalid'
-                
-            if column.get('unique', False):
-                conditions = {column_name: row[column_name]}
-                success, results = db.get_rows(table_name=self.table_name, where_items=conditions)
-                if not success:
-                    return False, results
-                if len(results) > 0:
-                    return False, f'{column_name} is not unique'        
-        
-        return True, 'Row is valid'
+
+        return True, row
+
+        # check if each column is valid
+        # for column_name, column in self.schema[self.table_name]['columns'].items():
+        #     if column.get('not_null', False) and row.get(column_name) is None:
+        #         return False, f'{column_name} is missing'
+        #     if column.get('allowed_values', False) and row.get(column_name) not in column['allowed_values']:
+        #         return False, f'{column_name} is invalid'
+        #     if column.get('type', False) and row.get(column_name) is not None:
+        #         if column['type'] == 'INT' and not row[column_name].isdigit():
+        #             return False, f'{column_name} is invalid'
+        #         if column['type'] == 'VARCHAR' and len(row[column_name]) > int(column['type'][8:-1]):
+        #             return False, f'{column_name} is invalid'
+        #         if column['type'] == 'DATETIME':
+        #             try:
+        #                 datetime.strptime(row[column_name], '%Y-%m-%d %H:%M:%S')
+        #             except ValueError:
+        #                 return False, f'{column_name} is invalid'
+        #         if column['type'] == 'DATE':
+        #             try:
+        #                 datetime.strptime(row[column_name], '%Y-%m-%d')
+        #             except ValueError:
+        #                 return False, f'{column_name} is invalid'
+        #
+        #     if column.get('foreign_key', False) and row.get(column_name) is not None:
+        #         foreign_table_name = self.foreign_keys[column_name]['table_name']
+        #         foreign_column_name = self.foreign_keys[column_name]['column_name']
+        #         conditions = {foreign_column_name: row[column_name]}
+        #         success, results = db.get_rows(table_name=foreign_table_name, where_items=conditions)
+        #         if not success:
+        #             return False, results
+        #         if len(results) == 0:
+        #             return False, f'{column_name} is invalid'
+        #
+        #     if column.get('unique', False):
+        #         conditions = {column_name: row[column_name]}
+        #         success, results = db.get_rows(table_name=self.table_name, where_items=conditions)
+        #         if not success:
+        #             return False, results
+        #         if len(results) > 0:
+        #             return False, f'{column_name} is not unique'
+        #
+        # return True, 'Row is valid'
 
     def get_foreign_keys_data(self, db):
         foreign_keys = {}
@@ -92,10 +98,10 @@ class SimpleCRUD:
         data = payload['data']
         db = payload['db']
 
-        # validate row
-        # success, message = self.validate_row(data, db)
-        # if not success:
-        #     return {'error': message}, 400
+        # validate data
+        success, data = self.validate_data(data, db)
+        if not success:
+            return {'error': data}, 400
         
         # insert row into table
         success, results = db.insert_row(table_name=self.table_name, row=data)
@@ -140,11 +146,11 @@ class SimpleCRUD:
 
         if data.get(self.primary_key) is None:
             return {'error': f'{self.primary_key} is missing'}, 400
-        
-        # validate row
-        # success, message = self.validate_row(data, db)
-        # if not success:
-        #     return {'error': message}, 400
+
+        # validate data
+        success, data = self.validate_data(data, db)
+        if not success:
+            return {'error': data}, 400
 
         conditions = {self.primary_key: data[self.primary_key]}
         del data[self.primary_key]
@@ -159,7 +165,7 @@ class SimpleCRUD:
     def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
-        print(data)
+
         if data.get(self.primary_key) is None:
             return {'error': f'{self.primary_key} is missing'}, 400
 

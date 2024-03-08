@@ -1,27 +1,27 @@
 from server.database.simple_crud import SimpleCRUD
-from server.services.iam.controllers.group import Group
 from server.services.iam.controllers.policy import Policy
 from server.services.iam.controllers.api_keys import ApiKey
+from server.services.iam.controllers.user import User
 
 
 class IAM:
     def __init__(self):
         self.name = 'IAM'
 
-        self.handlers = {
-            'User': SimpleCRUD(table_name='iam_users'),
+        self.controllers = {
+            'User': User(),
             'Group': SimpleCRUD(table_name='iam_groups'),
-            'Policy': SimpleCRUD(table_name='iam_policies'),
+            'Policy': Policy(),
             'ApiKey': ApiKey()
         }
 
-    def handle(self, payload: dict, handler: str, method: str):
-        if self.handlers.get(handler) is None:
-            return {'error': 'API Handler is invalid'}, 400
+    def handle(self, payload: dict, controller: str, method: str):
+        if self.controllers.get(controller) is None:
+            return {'error': 'API Controller is invalid'}, 400
 
         try:
-            handler_method = getattr(self.handlers[handler], method)
-            msg, status_code = handler_method(payload)
+            controller_method = getattr(self.controllers[controller], method)
+            msg, status_code = controller_method(payload)
             return msg, status_code
         except AttributeError as e:
             print(e)

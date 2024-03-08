@@ -33,8 +33,12 @@ schema = {
                 "not_null": True
             },
             "key_value": {
-                "type": "VARCHAR(512)",
+                "type": "VARCHAR(256)",
                 "unique": True,
+                "not_null": True
+            },
+            "key_salt": {
+                "type": "VARCHAR(256)",
                 "not_null": True
             },
             "key_group": {
@@ -43,7 +47,8 @@ schema = {
             },
             "key_owner": {
                 "type": "VARCHAR(128)",
-                "not_null": True
+                "not_null": True,
+                "foreign_key": "iam_users.email"
             },
             "key_rate_limit": {
                 "type": "INT",
@@ -71,7 +76,19 @@ schema = {
               "foreign_key": "iam_groups.name",
               "unique": True,
               "not_null": True
-            }
+            },
+            "salt": {
+                "type": "VARCHAR(256)",
+                "not_null": True
+            },
+            "password_hashed": {
+                "type": "VARCHAR(64)",
+                "not_null": True
+            },
+            "last_time_active": {
+                "type": "VARCHAR(64)",
+                "not_null": True
+            },
         },
     },
     "iam_groups": {
