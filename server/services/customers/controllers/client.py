@@ -1,6 +1,4 @@
-from datetime import datetime
-from server.database.schema import schema
-from server.database.simple_crud import SimpleCRUD
+from server.common.crud import SimpleCRUD
 
 
 class Client(SimpleCRUD):

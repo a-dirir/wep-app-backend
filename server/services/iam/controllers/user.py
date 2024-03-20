@@ -64,7 +64,7 @@ class User:
 
         # get row from table
         conditions = {'email': data['email']}
-        success, results = db.get_row(table_name=self.table_name, where_items=conditions)
+        success, results = db.get_row(table_name=self.table_name, where_items=[conditions])
 
         if not success:
             return {'error': results}, 400
@@ -85,6 +85,8 @@ class User:
             user.pop('password_hashed')
             user.pop('salt')
 
+        results = {'rows': results}
+
         return results, 200
 
     def delete(self, payload: dict):
@@ -97,7 +99,7 @@ class User:
 
         # delete row from table
         conditions = {'email': data['email']}
-        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
+        success, results = db.delete_row(table_name=self.table_name, where_items=[conditions])
 
         if not success:
             return {'error': results}, 400
@@ -114,7 +116,7 @@ class User:
 
         # get row from table
         conditions = {'email': data['email']}
-        success, results = db.get_row(table_name=self.table_name, where_items=conditions)
+        success, results = db.get_row(table_name=self.table_name, where_items=[conditions])
 
         if not success:
             return {'error': results}, 400

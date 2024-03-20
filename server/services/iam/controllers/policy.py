@@ -8,9 +8,12 @@ class Policy:
 
     def validate_data(self, row: dict):
         # remove extra columns
+        new_row = {}
         for key in row.keys():
-            if key not in self.schema[self.table_name]['columns']:
-                del row[key]
+            if key in self.schema[self.table_name]['columns']:
+                new_row[key] = row[key]
+
+        row = new_row
 
         for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('not_null', False) and row.get(column_name) is None:
@@ -54,18 +57,15 @@ class Policy:
                         if resource not in current_resources:
                             current_resources.append(resource)
 
-
                     permissions[action][statement['effect']] = {
                         'customers': current_customers,
                         'resources': current_resources
                     }
 
-
         expanded_policy = {
             "version": policy['version'],
             "permissions": permissions
         }
-
 
         return expanded_policy
 
@@ -73,12 +73,16 @@ class Policy:
         data = payload['data']
         db = payload['db']
 
+        data['expanded_policy'] = Policy._expandPolicy(data['policy'])
+
+        # replace single quotes with double quotes
+        data['policy'] = str(data['policy']).replace("'", '"')
+        data['expanded_policy'] = str(data['expanded_policy']).replace("'", '"')
+
         # validate data
         success, data = self.validate_data(data)
         if not success:
             return {'error': data}, 400
-
-        data['expanded_policy'] = Policy._expandPolicy(data['policy'])
 
         # insert row into table
         success, results = db.insert_row(table_name=self.table_name, row=data)
@@ -104,6 +108,9 @@ class Policy:
         if not success:
             return {'error': results}, 400
 
+        for result in results:
+            result['policy'] = eval(result['policy'])
+
         return results, 200
 
     def list(self, payload: dict):
@@ -115,23 +122,32 @@ class Policy:
         if not success:
             return {'error': results}, 400
 
+        for result in results:
+            result['policy'] = eval(result['policy'])
+
+        results = {'rows': results}
+
         return results, 200
 
     def update(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
+        data['expanded_policy'] = self._expandPolicy(data['policy'])
+
+        # replace single quotes with double quotes
+        data['policy'] = str(data['policy']).replace("'", '"')
+        data['expanded_policy'] = str(data['expanded_policy']).replace("'", '"')
+
         # validate data
         success, data = self.validate_data(data)
         if not success:
             return {'error': data}, 400
 
-        data['expanded_policy'] = self._expandPolicy(data['policy'])
-
         # update row in table
         conditions = {'name': data['name']}
         data.pop('name')
-        success, results = db.update_row(table_name=self.table_name, row=data, where_items=conditions)
+        success, results = db.update_row(table_name=self.table_name, row=data, where_items=[conditions])
 
         if not success:
             return {'error': results}, 400
@@ -143,13 +159,12 @@ class Policy:
         db = payload['db']
 
         # validate data
-        success, data = self.validate_data(data)
-        if not success:
-            return {'error': data}, 400
+        if data.get('name') is None:
+            return {'error': 'name is missing'}, 400
 
         # delete row from table
         conditions = {'name': data['name']}
-        success, results = db.delete_row(table_name=self.table_name, where_items=conditions)
+        success, results = db.delete_row(table_name=self.table_name, where_items=[conditions])
 
         if not success:
             return {'error': results}, 400

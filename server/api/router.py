@@ -1,8 +1,7 @@
-import logging
-
-from server.authorizer import Authorizer
+from server.api.authorizer import Authorizer
 from server.services.customers.service import Customers
 from server.services.iam.service import IAM
+from server.util import get_logger
 
 
 class Router:
@@ -13,17 +12,11 @@ class Router:
         }
         self.authorizer = Authorizer()
 
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s %(message)s",
-                                      datefmt="%Y-%m-%d %H:%M:%S")
-        fh = logging.FileHandler("server.log", "a")
-        fh.setFormatter(formatter)
-        self.logger.addHandler(fh)
+        self.logger = get_logger(__name__)
 
     def route(self, payload: dict):
         access = payload['access']
-        user = payload['user']['id']
+        user = payload['user']
 
         # check if user is authorized to access the requested resource
         if not self.authorizer.is_authorized(payload):
@@ -34,12 +27,16 @@ class Router:
         service = str(action[0]); controller = str(action[1]); method = str(action[2])
 
         if self.services.get(service) is None:
-            return {'error': 'API Service is invalid'}, 400
+            return {'error': f'API Service {service} is invalid'}, 400
 
         msg, status_code = self.services[service].handle(payload, controller, method)
 
         # log request
-        self.logger.info(f"{user['id']} {access['action']} {access['customers']} {access['resources']} {status_code}")
+        if status_code == 200:
+            self.logger.info(f"User {user['username']} performed action {access} successfully")
+
+        else:
+            self.logger.error(f"User {user['username']} failed to perform action {access} with error {msg}")
 
         return msg, status_code
 

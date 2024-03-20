@@ -1,9 +1,14 @@
 from datetime import datetime
 from server.database.schema import schema
+from server.common.controller import BaseController
 
 
-class SimpleCRUD:
+class SimpleCRUD(BaseController):
     def __init__(self, table_name: str):
+        super().__init__()
+        self.name = 'SimpleCRUD'
+        self.methods = ['create', 'read', 'list', 'update', 'delete']
+
         self.table_name = table_name
         self.schema = schema
 
@@ -25,57 +30,18 @@ class SimpleCRUD:
 
     def validate_data(self, row: dict, db):
         # remove extra columns
+        new_row = {}
         for key in row.keys():
-            if key not in self.schema[self.table_name]['columns']:
-                del row[key]
+            if key in self.schema[self.table_name]['columns']:
+                new_row[key] = row[key]
+
+        row = new_row
 
         for column_name, column in self.schema[self.table_name]['columns'].items():
             if column.get('not_null', False) and row.get(column_name) is None:
                 return False, f'{column_name} is missing'
 
         return True, row
-
-        # check if each column is valid
-        # for column_name, column in self.schema[self.table_name]['columns'].items():
-        #     if column.get('not_null', False) and row.get(column_name) is None:
-        #         return False, f'{column_name} is missing'
-        #     if column.get('allowed_values', False) and row.get(column_name) not in column['allowed_values']:
-        #         return False, f'{column_name} is invalid'
-        #     if column.get('type', False) and row.get(column_name) is not None:
-        #         if column['type'] == 'INT' and not row[column_name].isdigit():
-        #             return False, f'{column_name} is invalid'
-        #         if column['type'] == 'VARCHAR' and len(row[column_name]) > int(column['type'][8:-1]):
-        #             return False, f'{column_name} is invalid'
-        #         if column['type'] == 'DATETIME':
-        #             try:
-        #                 datetime.strptime(row[column_name], '%Y-%m-%d %H:%M:%S')
-        #             except ValueError:
-        #                 return False, f'{column_name} is invalid'
-        #         if column['type'] == 'DATE':
-        #             try:
-        #                 datetime.strptime(row[column_name], '%Y-%m-%d')
-        #             except ValueError:
-        #                 return False, f'{column_name} is invalid'
-        #
-        #     if column.get('foreign_key', False) and row.get(column_name) is not None:
-        #         foreign_table_name = self.foreign_keys[column_name]['table_name']
-        #         foreign_column_name = self.foreign_keys[column_name]['column_name']
-        #         conditions = {foreign_column_name: row[column_name]}
-        #         success, results = db.get_rows(table_name=foreign_table_name, where_items=conditions)
-        #         if not success:
-        #             return False, results
-        #         if len(results) == 0:
-        #             return False, f'{column_name} is invalid'
-        #
-        #     if column.get('unique', False):
-        #         conditions = {column_name: row[column_name]}
-        #         success, results = db.get_rows(table_name=self.table_name, where_items=conditions)
-        #         if not success:
-        #             return False, results
-        #         if len(results) > 0:
-        #             return False, f'{column_name} is not unique'
-        #
-        # return True, 'Row is valid'
 
     def get_foreign_keys_data(self, db):
         foreign_keys = {}
