@@ -5,28 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/api/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/common/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/common/controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/common/service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/error.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/success.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/api/policies.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/authenticator.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authenticator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/authorizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authorizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/config.env" beforeDir="false" afterPath="$PROJECT_DIR$/server/config.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/simple_crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/policy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/authenticator.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authenticator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/authorizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authorizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/server/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/group.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/policy.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/server/services/iam/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/success.log" beforeDir="false" afterPath="$PROJECT_DIR$/server/success.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,16 +40,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/services/customers/controllers",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/services/customers/controllers&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.copilot.settings.ApplicationConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\customers\controllers" />
@@ -93,6 +82,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="schedule_optimization" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="crm-back-end" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/server" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/server/schedule_optimization.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -117,6 +127,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.schedule_optimization" />
         <item itemvalue="Python.server" />
       </list>
     </recent_temporary>
