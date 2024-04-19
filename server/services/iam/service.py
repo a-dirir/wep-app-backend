@@ -1,5 +1,4 @@
 from server.common.service import BaseService
-from server.services.iam.controllers.api_keys import ApiKey
 from server.services.iam.controllers.user import User
 
 
@@ -10,5 +9,7 @@ class IAM(BaseService):
 
         self.controllers = {
             'User': User(),
-            'ApiKey': ApiKey()
         }
+
+
+print(User.__name__)

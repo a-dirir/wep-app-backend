@@ -24,42 +24,6 @@ schema_template = {
 
 
 schema = {
-    "iam_api_keys": {
-        "columns": {
-            "key_id": {
-                "type": "VARCHAR(256)",
-                "primary_key": True,
-                "unique": True,
-                "not_null": True
-            },
-            "key_value": {
-                "type": "VARCHAR(256)",
-                "unique": True,
-                "not_null": True
-            },
-            "key_salt": {
-                "type": "VARCHAR(256)",
-                "not_null": True
-            },
-            "key_group": {
-                "type": "VARCHAR(64)",
-                "not_null": True
-            },
-            "key_owner": {
-                "type": "VARCHAR(128)",
-                "not_null": True,
-                "foreign_key": "iam_users.email"
-            },
-            "key_rate_limit": {
-                "type": "INT",
-                "not_null": True
-            },
-            "key_last_time_used": {
-              "type": "DATETIME",
-              "not_null": True
-            },
-        },
-    },
     "iam_users": {
         "columns": {
             "email": {
@@ -73,9 +37,9 @@ schema = {
             },
             "user_group": {
               "type": "VARCHAR(64)",
-              "foreign_key": "iam_groups.name",
               "unique": True,
-              "not_null": True
+              "not_null": True,
+              "allowed_values": ["user", "admin"]
             },
             "salt": {
                 "type": "VARCHAR(256)",
@@ -84,52 +48,8 @@ schema = {
             "password_hashed": {
                 "type": "VARCHAR(64)",
                 "not_null": True
-            },
-            "last_time_active": {
-                "type": "VARCHAR(64)",
-                "not_null": True
-            },
-        },
-    },
-    "iam_groups": {
-        "columns": {
-            "name": {
-              "type": "VARCHAR(64)",
-              "primary_key": True,
-              "unique": True,
-              "not_null": True
-            },
-            "description": {
-              "type": "VARCHAR(128)"
-            },
-            "policy": {
-              "type": "VARCHAR(64)",
-              "foreign_key": "iam_policies.name",
-              "unique": True,
-              "not_null": True
             }
-        }
-    },
-    "iam_policies": {
-        "columns": {
-            "name": {
-              "type": "VARCHAR(64)",
-              "primary_key": True,
-              "unique": True,
-              "not_null": True
-            },
-            "description": {
-              "type": "VARCHAR(128)"
-            },
-            "policy": {
-              "type": "JSON",
-              "not_null": True
-            },
-            "expanded_policy": {
-              "type": "JSON",
-              "not_null": True
-            },
-        }
+        },
     },
     "clients": {
         "columns": {

@@ -1,3 +1,12 @@
 2024-04-12 10:45:08 ERROR User failed to provide credentials
 2024-04-12 10:45:17 ERROR User failed to provide credentials
 2024-04-12 10:46:36 ERROR User failed to provide credentials
+2024-04-16 19:32:17 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action IAM:User:list
+2024-04-16 19:48:41 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resource': '*', 'customer': '*'}
+2024-04-16 20:04:18 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resource': '*', 'customer': '*'}
+2024-04-16 20:06:37 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resource': '*', 'customer': '*'}
+2024-04-16 20:07:50 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resource': '*', 'customer': '*'}
+2024-04-16 20:09:06 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resources': '*', 'customers': '*'}
+2024-04-17 23:20:52 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resources': '*', 'customers': '*'}
+2024-04-17 23:25:29 ERROR User ahmed.dirir@bespinglobal.ae is not authorized to perform the action {'action': 'IAM:User:list', 'resources': '*', 'customers': '*'}
+2024-04-17 23:36:34 ERROR User ahmed.dirir@bespinglobal.ae failed to perform action {'action': 'IAM:User:list', 'resource': '*', 'customer': '*'} with error {'error': 'Some error happened, please try again'}

@@ -35,8 +35,20 @@ class Authorizer:
         if self.policies.get(group) is None:
             return False
 
-        permission = self.policies[group]['permissions'].get(action)
+        # check for * wildcard
+        if '*' in self.policies[group]['permissions']:
+            if self.check_action(group, '*', customer, resource):
+                return True
 
+        # check for specific action
+        if self.policies[group]['permissions'].get(action) is not None:
+            if self.check_action(group, action, customer, resource):
+                return True
+
+        return False
+
+    def check_action(self, group: str, action: str, customer: str, resource: str):
+        permission = self.policies[group]['permissions'].get(action)
         if permission is None:
             return False
 

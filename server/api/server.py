@@ -24,7 +24,11 @@ class Server:
     def routes(self):
         @self.app.route('/auth', methods=['POST'])
         def auth():
-            return jsonify(msg='salam'), 200
+            payload: dict = request.get_json()
+            if not self.authenticator.is_authentic(payload):
+                return jsonify(msg={'error': 'Invalid username or password'}), 400
+
+            return jsonify(msg={}), 200
 
         @self.app.route('/app', methods=['POST'])
         def app():
@@ -32,6 +36,13 @@ class Server:
             payload: dict = request.get_json()
             payload['db'] = self.db
             payload['router'] = self.router
+
+            user_group = self.authenticator.get_user_group(payload.get('user'))
+
+            if user_group is None:
+                return jsonify(msg={'error': 'User is not authenticated'}), 400
+
+            payload['user'] = {'username': payload['user'], 'group': user_group}
 
             # route the request to the appropriate service, controller and method
             msg, status_code = self.router.route(payload)

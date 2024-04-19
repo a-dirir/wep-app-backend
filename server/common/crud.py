@@ -1,4 +1,3 @@
-from datetime import datetime
 from server.database.schema import schema
 from server.common.controller import BaseController
 
