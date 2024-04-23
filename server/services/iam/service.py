@@ -10,6 +10,3 @@ class IAM(BaseService):
         self.controllers = {
             'User': User(),
         }
-
-
-print(User.__name__)

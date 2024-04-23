@@ -38,11 +38,28 @@ class Server:
             payload['router'] = self.router
 
             user_group = self.authenticator.get_user_group(payload.get('user'))
-
             if user_group is None:
                 return jsonify(msg={'error': 'User is not authenticated'}), 400
 
             payload['user'] = {'username': payload['user'], 'group': user_group}
+
+            # route the request to the appropriate service, controller and method
+            msg, status_code = self.router.route(payload)
+
+            # return a flask response object to the client
+            if status_code == 200:
+                return jsonify(msg=msg), status_code
+            else:
+                return jsonify(msg['error']), status_code
+
+        @self.app.route('/test', methods=['POST'])
+        def test():
+            # load json data from request
+            payload: dict = request.get_json()
+            payload['db'] = self.db
+            payload['router'] = self.router
+
+            payload['user'] = {'username': 'ahmed.dirir@bespinglobal.ae', 'group': 'admin'}
 
             # route the request to the appropriate service, controller and method
             msg, status_code = self.router.route(payload)
