@@ -10,7 +10,7 @@ policies = {
             }
         ]
     },
-    "basic": {
+    "user": {
         "version": "v1",
         "statements": [
             {

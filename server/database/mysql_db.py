@@ -37,7 +37,7 @@ class MySQLDB:
         for row in rows:
             row_dict = {}
             for i in range(len(columns)):
-                row_dict[columns[i]] = row[i]
+                row_dict[columns[i]] = str(row[i])
             result.append(row_dict)
         return result
 

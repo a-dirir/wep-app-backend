@@ -1,73 +1,66 @@
 from server.database.schema import schema
 from server.common.controller import BaseController
+from server.database.schema_controller import SchemaController
 
 
 class SimpleCRUD(BaseController):
     def __init__(self, table_name: str):
         super().__init__()
         self.name = 'SimpleCRUD'
-        self.methods = ['create', 'read', 'list', 'update', 'delete']
+        self.methods = ['create', 'list', 'update', 'delete', 'showLinkedServices']
 
         self.table_name = table_name
         self.schema = schema
+        self.schema_controller = SchemaController()
 
-        self.primary_key = None
-        self.foreign_keys = {}
-        
-        self.extract_indexes()
+        self.index_keys, self.foreign_keys = self.schema_controller.extract_indexes(self.table_name)
+        self.client_side_columns = self.schema_controller.get_client_side_columns(self.table_name)
 
-    def extract_indexes(self):
-        for column_name, column in self.schema[self.table_name]['columns'].items():
-            if column.get('primary_key', False):
-                self.primary_key = column_name
-            if column.get('foreign_key', False):
-                foreign_table_name, foreign_column_name = column['foreign_key'].split('.')
-                self.foreign_keys[column_name] = {
-                    'table_name': foreign_table_name,
-                    'column_name': foreign_column_name
-                }
-
-    def validate_data(self, row: dict, db):
-        # remove extra columns
+    def remove_extra_columns(self, row: dict):
         new_row = {}
         for key in row.keys():
             if key in self.schema[self.table_name]['columns']:
                 new_row[key] = row[key]
+        return new_row
 
-        row = new_row
-
+    def validate_data(self, row: dict):
         for column_name, column in self.schema[self.table_name]['columns'].items():
-            if column.get('not_null', False) and row.get(column_name) is None:
+            if column.get('not_null', False) and row.get(column_name) is None and not column.get('server_only', False):
                 return False, f'{column_name} is missing'
 
         return True, row
 
-    def get_foreign_keys_data(self, db):
-        foreign_keys = {}
-        for foreign_columns, sources in self.foreign_keys.items():
-            foreign_table_name = sources['table_name']
-            foreign_column_name = sources['column_name']
-            success, results = db.get_rows(table_name=foreign_table_name, columns=[foreign_column_name],
-                                           distinct="DISTINCT", return_type="list")
+    def list(self, payload: dict):
+        db = payload['db']
 
-            if not success:
-                return False, results
+        success, results = db.get_rows(table_name=self.table_name, columns=self.client_side_columns)
+        if not success:
+            return {'error': results}, 400
 
-            # remove inner tuple
-            results = [result[0] for result in results]
-            foreign_keys[foreign_columns] = results
+        # get foreign keys data
+        success, data = self.schema_controller.replace_source_with_destination(self.foreign_keys, results, db)
+        if not success:
+            return {'error': data}, 400
 
-        return True, foreign_keys
+        return data, 200
 
     def create(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        # validate data
-        success, data = self.validate_data(data, db)
+        data = self.remove_extra_columns(data)
+
+        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys, data, db)
         if not success:
             return {'error': data}, 400
-        
+
+        data = self.on_create(data, db)
+
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
+
         # insert row into table
         success, results = db.insert_row(table_name=self.table_name, row=data)
 
@@ -76,49 +69,31 @@ class SimpleCRUD(BaseController):
 
         return results, 200
 
-    def read(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
-        
-        if data.get(self.primary_key) is None:
-            return {'error': f'{self.primary_key} is missing'}, 400
-        
-        conditions = {self.primary_key: data[self.primary_key]}
-
-        success, results = db.get_rows(table_name=self.table_name, where_items=conditions)
-        if not success:
-            return {'error': results}, 400
-
-        return results, 200
-
-    def list(self, payload: dict):
-        db = payload['db']
-
-        success, results = db.get_rows(table_name=self.table_name)
-        if not success:
-            return {'error': results}, 400
-
-        # get foreign keys data
-        success, foreign_keys_data = self.get_foreign_keys_data(db)
-        if not success:
-            return {'error': foreign_keys_data}, 400
-
-        return {"rows": results, "allowed_values": foreign_keys_data}, 200
-
     def update(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        if data.get(self.primary_key) is None:
-            return {'error': f'{self.primary_key} is missing'}, 400
+        data['new'] = self.remove_extra_columns(data['new'])
+        data['old'] = self.remove_extra_columns(data['old'])
 
-        # validate data
-        success, data = self.validate_data(data, db)
+        for key in self.index_keys:
+            if data['old'].get(key) is None:
+                return {'error': f'{key} is missing'}, 400
+
+        conditions = {key: data['old'][key] for key in self.index_keys}
+
+        data = data['new']
+
+        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys, data, db)
         if not success:
             return {'error': data}, 400
 
-        conditions = {self.primary_key: data[self.primary_key]}
-        del data[self.primary_key]
+        data = self.on_update(data, db)
+
+        # validate data
+        success, data = self.validate_data(data)
+        if not success:
+            return {'error': data}, 400
 
         # update row in table
         success, results = db.update_row(table_name=self.table_name, row=data, where_items=[conditions])
@@ -131,12 +106,47 @@ class SimpleCRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        if data.get(self.primary_key) is None:
-            return {'error': f'{self.primary_key} is missing'}, 400
+        for key in self.index_keys:
+            if data.get(key) is None:
+                return {'error': f'{key} is missing'}, 400
 
-        conditions = {self.primary_key: data[self.primary_key]}
+        conditions = {key: data[key] for key in self.index_keys}
 
         success, results = db.delete_row(table_name=self.table_name, where_items=[conditions])
+        if not success:
+            return {'error': results}, 400
+
+        return results, 200
+
+    def on_create(self, data: dict, db):
+        return data
+
+    def on_update(self, data: dict, db):
+        return data
+
+    def showLinkedServices(self, payload: dict):
+        data = payload['data']
+        db = payload['db']
+
+        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys, data, db)
+        if not success:
+            return {'error': data}, 400
+
+        for key in self.index_keys:
+            if data.get(key) is None:
+                return {'error': f'{key} is missing'}, 400
+
+        conditions = {key: data[key] for key in self.index_keys}
+
+        # get full row
+        success, results = db.get_rows(table_name=self.table_name, where_items=[conditions])
+        if not success:
+            return {'error': results}, 400
+
+        updated_data = results[0]
+        # get linked records
+        success, results = self.schema_controller.get_linked_records(self.table_name, updated_data, db)
+
         if not success:
             return {'error': results}, 400
 

@@ -10,18 +10,18 @@ schema_template = {
         {
             "column_name": {
                 "type": "type",
-                "primary_key": True, default is False
+                "index": True, default is False
                 "foreign_key": "table_name.column_name", default is ""
                 "unique": True, default is False
                 "not_null": True, default is False
                 "default": "", default is "",
-                "allowed_values": ["value1", "value2", ...], default is []
+                "allowed_values": ["value1", "value2", ...], default is [],
+                "server_only": True, default is False,
             }
         }
     }
 }
 """
-
 
 schema = {
     "iam_users": {
@@ -46,7 +46,7 @@ schema = {
                 "not_null": True
             },
             "password_hashed": {
-                "type": "VARCHAR(64)",
+                "type": "VARCHAR(256)",
                 "not_null": True
             }
         },
@@ -55,14 +55,13 @@ schema = {
         "columns": {
             "Client_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "unique": True,
-                "not_null": True
+                "not_null": True,
+                "server_only": True,
             },
             "Name": {
                 "type": "VARCHAR(200)",
-                "unique": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
         }
     },
@@ -70,19 +69,18 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "unique": True,
-                "not_null": True
+                "not_null": True,
+                "server_only": True
             },
             "Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "clients.Client_ID",
+                "foreign_key": "clients.Client_ID=>clients.Name",
                 "not_null": True
             },
             "Name": {
                 "type": "VARCHAR(200)",
-                "unique": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Status": {
                 "type": "VARCHAR(45)",
@@ -107,7 +105,7 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID",
+                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
                 "not_null": True
             },
             "Account_Manager": {
@@ -124,7 +122,9 @@ schema = {
             },
             "Contact_Type": {
                 "type": "VARCHAR(80)",
-                "not_null": True
+                "not_null": True,
+                "allowed_values": ["Primary Contact", "Secondary Contact", "Escalation Contact"],
+                "index": True
             },
             "Position": {
                 "type": "VARCHAR(80)",
@@ -132,19 +132,16 @@ schema = {
             },
             "Contact_Name": {
                 "type": "VARCHAR(120)",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Contact_Email": {
                 "type": "VARCHAR(80)",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Contact_Number": {
                 "type": "VARCHAR(45)",
-                "not_null": True
-            },
-            "Contact_ID": {
-                "type": "INT",
-                "primary_key": True,
                 "not_null": True
             },
         }
@@ -153,13 +150,13 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID",
+                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
                 "not_null": True
             },
             "URL": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "URL_SSL_Expiry_Date": {
                 "type": "VARCHAR(50)",
@@ -171,13 +168,13 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID",
+                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
                 "not_null": True
             },
             "Account_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Name": {
                 "type": "VARCHAR(200)",
@@ -185,7 +182,6 @@ schema = {
             },
             "Master_Account": {
                 "type": "VARCHAR(100)",
-                "not_null": True,
             },
             "region": {
                 "type": "VARCHAR(50)",
@@ -197,13 +193,13 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID",
+                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
                 "not_null": True
             },
             "Subscription_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Tenant_ID": {
                 "type": "VARCHAR(100)",
@@ -224,8 +220,8 @@ schema = {
             },
             "Tenant_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Name": {
                 "type": "VARCHAR(200)",
@@ -237,8 +233,8 @@ schema = {
         "columns": {
             "Product_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Name": {
                 "type": "VARCHAR(200)",
@@ -254,8 +250,8 @@ schema = {
         "columns": {
             "Addon_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Name": {
                 "type": "VARCHAR(200)",
@@ -271,17 +267,16 @@ schema = {
         "columns": {
             "Opportunity_ID_UQ": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
                 "not_null": True
             },
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID",
+                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
                 "not_null": True
             },
             "Status": {
@@ -302,14 +297,15 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Account_ID": {
                 "type": "VARCHAR(100)",
                 "foreign_key": "aws_accounts.Account_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
@@ -327,14 +323,15 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Subscription_ID": {
                 "type": "VARCHAR(100)",
                 "foreign_key": "azure_accounts.Subscription_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
@@ -352,14 +349,15 @@ schema = {
         "columns": {
             "Opportunity_ID": {
                 "type": "VARCHAR(100)",
-                "primary_key": True,
                 "foreign_key": "opportunities.Opportunity_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Tenant_ID": {
                 "type": "VARCHAR(100)",
                 "foreign_key": "m365_accounts.Tenant_ID",
-                "not_null": True
+                "not_null": True,
+                "index": True
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
