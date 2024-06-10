@@ -5,20 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/database/schema_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/api/policies.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/policies.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/api/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/mysql_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/mysql_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/server/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/contact.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/success.log" beforeDir="false" afterPath="$PROJECT_DIR$/server/success.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
