@@ -18,7 +18,8 @@ if __name__ == '__main__':
     load_dotenv("config.env")
 
     db = load_db()
+    website_dir = getenv("WEB_DIR")
 
-    server = Server(db)
+    server = Server(db, website_dir)
 
 

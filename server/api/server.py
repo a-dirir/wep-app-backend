@@ -3,6 +3,7 @@ import datetime
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask import render_template, send_from_directory
 
 
 from server.api.router import Router
@@ -21,9 +22,11 @@ class User(UserMixin):
 
 
 class Server:
-    def __init__(self, db: MySQLDB):
+    def __init__(self, db: MySQLDB, website_dir: str):
         self.db = db
-        self.app = Flask(__name__)
+        self.website_dir = website_dir
+        print(10, os.listdir(self.website_dir))
+        self.app = Flask(__name__, static_folder=self.website_dir, template_folder="../../static_files")
         self.app.config["SECRET_KEY"] = os.urandom(24)
         self.app.config['SESSION_COOKIE_SAMESITE'] = 'None'
         self.app.config['REMEMBER_COOKIE_SAMESITE'] = 'None'
@@ -114,28 +117,18 @@ class Server:
             else:
                 return jsonify(msg['error']), status_code
 
-        @self.app.route('/test', methods=['POST'])
-        @login_required
-        def test():
+        @self.app.route('/', methods=['GET'])
+        def index():
+            print(os.getcwd())
+            return send_from_directory(self.website_dir, 'index.html')
 
-            # load json data from request
-            payload: dict = request.get_json()
-            payload['db'] = self.db
-            payload['router'] = self.router
-
-            user_group = self.authenticator.get_user_group(current_user.username)
-            if user_group is None:
-                return jsonify(msg={'error': 'User is not authenticated'}), 400
-
-            payload['user'] = {'username': current_user.username, 'group': user_group}
-
-            # payload['user'] = {'username': 'ahmed.dirir@bespinglobal.ae', 'group': 'admin'}
-
-            # route the request to the appropriate service, controller and method
-            msg, status_code = self.router.route(payload)
-
-            # return a flask response object to the client
-            if status_code == 200:
-                return jsonify(msg=msg), status_code
+        @self.app.route('/<path:path>')
+        def serve_static(path):
+            # Check if the file exists in the static folder
+            file_path = os.path.join(self.website_dir, path)
+            if os.path.isfile(file_path):
+                return send_from_directory(self.website_dir, path)
             else:
-                return jsonify(msg['error']), status_code
+                # Return a 404 error if the file does not exist
+                return make_response(jsonify({'error': 'File not found'}), 404)
+
