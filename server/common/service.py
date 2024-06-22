@@ -13,5 +13,5 @@ class BaseService:
             return msg, status_code
         except Exception as e:
             print(e)
-            return {'error': 'Some error happened, please try again'}, 400
+            return {'error': e}, 400
 

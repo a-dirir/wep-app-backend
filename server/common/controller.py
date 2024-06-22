@@ -1,9 +1,11 @@
+from server.util import get_logger
 
 
 class BaseController:
     def __init__(self):
         self.name = 'BaseController'
         self.methods = []
+        self.logger = get_logger(__name__)
 
     def handle(self, payload: dict, method: str):
         if method not in self.methods:

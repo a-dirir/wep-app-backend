@@ -36,11 +36,13 @@ class SimpleCRUD(BaseController):
         success, results = db.get_rows(table_name=self.table_name, columns=self.client_side_columns)
         if not success:
             return {'error': results}, 400
+        self.logger.info(f"Success: list rows in {self.table_name}")
 
         # get foreign keys data
         success, data = self.schema_controller.replace_source_with_destination(self.foreign_keys, results, db)
         if not success:
             return {'error': data}, 400
+        self.logger.info(f"Success: replace source with destination in {self.table_name}")
 
         return data, 200
 
@@ -53,6 +55,7 @@ class SimpleCRUD(BaseController):
         success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys, data, db)
         if not success:
             return {'error': data}, 400
+        self.logger.info(f"Success: replace destination with source in {self.table_name} for create")
 
         data = self.on_create(data, db)
 
@@ -63,9 +66,9 @@ class SimpleCRUD(BaseController):
 
         # insert row into table
         success, results = db.insert_row(table_name=self.table_name, row=data)
-
         if not success:
             return {'error': results}, 400
+        self.logger.info(f"Success: insert row in {self.table_name}")
 
         return results, 200
 
@@ -87,6 +90,7 @@ class SimpleCRUD(BaseController):
         success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys, data, db)
         if not success:
             return {'error': data}, 400
+        self.logger.info(f"Success: replace destination with source in {self.table_name} for update")
 
         data = self.on_update(data, db)
 
@@ -99,6 +103,7 @@ class SimpleCRUD(BaseController):
         success, results = db.update_row(table_name=self.table_name, row=data, where_items=[conditions])
         if not success:
             return {'error': results}, 400
+        self.logger.info(f"Success: update row in {self.table_name}")
 
         return results, 200
 
@@ -115,6 +120,7 @@ class SimpleCRUD(BaseController):
         success, results = db.delete_row(table_name=self.table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
+        self.logger.info(f"Success: delete row in {self.table_name}")
 
         return results, 200
 

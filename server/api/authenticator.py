@@ -1,4 +1,5 @@
 import hashlib
+from server.util import get_logger
 
 
 class Authenticator:
@@ -6,6 +7,7 @@ class Authenticator:
         self.table_name = 'iam_users'
         self.db = db
         self.cache = {}
+        self.logger = get_logger(__name__)
 
     def is_authentic(self, user_credential: dict):
         username = user_credential.get('username')
