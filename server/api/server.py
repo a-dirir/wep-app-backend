@@ -25,7 +25,6 @@ class Server:
     def __init__(self, db: MySQLDB, website_dir: str):
         self.db = db
         self.website_dir = website_dir
-        print(10, os.listdir(self.website_dir))
         self.app = Flask(__name__, static_folder=self.website_dir, template_folder="../../static_files")
         self.app.config["SECRET_KEY"] = os.urandom(24)
         self.app.config['SESSION_COOKIE_SAMESITE'] = 'None'
@@ -42,7 +41,7 @@ class Server:
         self.logger = get_logger(__name__)
 
         self.routes()
-        self.app.run(host="0.0.0.0", port=8080, debug=True)
+        # self.app.run(host="0.0.0.0", port=8080, debug=True)
 
     @staticmethod
     @login_manager.user_loader
@@ -93,7 +92,7 @@ class Server:
 
         @self.app.route('/app', methods=['POST'])
         @login_required
-        def app():
+        def app1():
             if not current_user.is_authenticated:
                 return jsonify(msg='User is not authenticated'), 400
 
