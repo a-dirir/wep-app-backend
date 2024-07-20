@@ -14,8 +14,8 @@ class SchemaController:
                 index_keys.append(column_name)
 
             if column.get('foreign_key', False):
-                if column['foreign_key'].find('=>') != -1:
-                    source, destination = column['foreign_key'].split('=>')
+                if column['foreign_key'].find('|') != -1:
+                    source, destination = column['foreign_key'].split('|')
                     source_table_name, source_column_name = source.split('.')
                     destination_table_name, destination_column_name = destination.split('.')
                 else:
@@ -99,7 +99,7 @@ class SchemaController:
                 if column.get('foreign_key') is None:
                     dependency_mapping[f"{table_name}.{column_name}"] = None
                 else:
-                    dependency_mapping[f"{table_name}.{column_name}"] = column['foreign_key'].split('=>')[0]
+                    dependency_mapping[f"{table_name}.{column_name}"] = column['foreign_key'].split('|')[0]
 
         return dependency_mapping
 
@@ -140,10 +140,10 @@ class SchemaController:
 
         return graph
 
-    def get_linked_records(self, table_name: str, data: dict, db):
+    def get_linked_records(self, table_name: str, data: dict, foreign_keys: dict, client_side_columns: dict, db):
         sequence = [f"{table_name}"]
         rows = {f"{table_name}": [data]}
-
+        columns_order = {f"{table_name}": client_side_columns[table_name]}
         dependency_graph = self.get_dependency_graph(table_name)
 
         for dependency in dependency_graph:
@@ -158,10 +158,20 @@ class SchemaController:
                     where_items.append({mutual_column: row[mutual_column]})
 
                 success, results = db.get_rows(child_table, where_items=where_items)
+
                 if success and len(results) > 0:
                     rows[f"{child_table}"] = results
+
                     if f"{child_table}" not in sequence:
                         sequence.append(f"{child_table}")
+                        columns_order[f"{child_table}"] = client_side_columns[child_table]
                 else:
                     continue
-        return True, {"sequence": sequence, "linked_records": rows}
+
+        for table_name in rows.keys():
+            if len(foreign_keys[table_name]) != 0:
+                success, results = self.replace_source_with_destination(foreign_keys[table_name], rows[table_name], db)
+                if success:
+                    rows[table_name] = results['data']
+
+        return True, {"tables_sequence": sequence, "data": rows, "columns_order": columns_order}

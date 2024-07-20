@@ -1,10 +1,26 @@
 import mysql.connector
+import mysql.connector.pooling
 from server.database.schema import schema
+from server.util import get_logger
+from os import environ
 
 
 class MySQLDB:
-    def __init__(self, host: str, user: str, password: str, database: str):
-        self.mydb = mysql.connector.connect(host=host, user=user, password=password, database=database)
+    def __init__(self):
+        self.pool = mysql.connector.pooling.MySQLConnectionPool(
+            pool_name="crm_pool",
+            pool_size=10,
+            pool_reset_session=True,
+            host=environ.get("MYSQL_HOST"),
+            user=environ.get("MYSQL_USER"),
+            password=environ.get("MYSQL_PASSWORD"),
+            database=environ.get("MYSQL_DATABASE_NAME")
+        )
+        
+        self.logger = get_logger(__name__)
+
+    def get_connection(self):
+        return self.pool.get_connection()
 
     @staticmethod
     def generate_where_clause(where_items: list):
@@ -41,8 +57,13 @@ class MySQLDB:
             result.append(row_dict)
         return result
 
-    def get_rows(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = "", return_type: str = "dict"):
+    def get_rows(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = "",
+                 return_type: str = "dict"):
+        cursor = None
+        db = None
+
         try:
+            db = self.get_connection()
             if columns is None:
                 columns = list(schema[table_name]['columns'].keys())
             columns_str = ", ".join(columns)
@@ -51,33 +72,54 @@ class MySQLDB:
                 where_clause = self.generate_where_clause(where_items)
                 sql = f"{sql} WHERE {where_clause}"
 
-            mycursor = self.mydb.cursor()
-            mycursor.execute(sql)
+            cursor = db.cursor()
+            cursor.execute(sql)
+            results = cursor.fetchall()
 
-            if return_type == "list":
-                return True, mycursor.fetchall()
-            elif return_type == "dict":
-                results = self.convert_results_to_dict(mycursor.fetchall(), columns)
-                return True, results
-            else:
-                return False, "Invalid return_type"
+            if return_type == "dict":
+                results = self.convert_results_to_dict(results, columns)
+            
+            self.logger.info(f"Rows fetched successfully {sql}")
+            return True, results
+
         except Exception as e:
-            return False, f"Error fetching rows from Table ({table_name})\n{e}"
+            self.logger.error(f"Error fetching rows from Table ({table_name}) {sql} \n{e}")
+            return False, f"Error fetching data from database"
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if db is not None:
+                db.close()
 
     def insert_row(self, table_name: str, row: dict):
+        cursor = None
+        db = None
+
         try:
+            db = self.get_connection()
             keys = ", ".join(row.keys())
             values = tuple(row.values())
             sql = f"INSERT INTO {table_name} ({keys}) VALUES {values}"
-            mycursor = self.mydb.cursor()
-            mycursor.execute(sql)
-            self.mydb.commit()
+            cursor = db.cursor()
+            cursor.execute(sql)
+            db.commit()
+            self.logger.info(f"Row inserted successfully {sql}")
             return True, f"Row inserted successfully"
         except Exception as e:
-            return False, f"Error fetching rows from Table ({table_name})\n{e}"
+            self.logger.error(f"Error inserting rows into Table ({table_name}) {sql} \n{e}")
+            return False, f"Error inserting rows into database"
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if db is not None:
+                db.close()
 
     def update_row(self, table_name: str, row: dict, where_items: list):
+        cursor = None
+        db = None
+
         try:
+            db = self.get_connection()
             set_clause = ""
             for key, value in row.items():
                 if value[0] != "'" and value[-1] != "'":
@@ -88,25 +130,47 @@ class MySQLDB:
 
             where_clause = self.generate_where_clause(where_items)
             sql = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause};"
-            mycursor = self.mydb.cursor()
-            mycursor.execute(sql)
-            self.mydb.commit()
+            cursor = db.cursor()
+            cursor.execute(sql)
+            db.commit()
+            self.logger.info(f"Row updated successfully {sql}")
             return True, f"Row updated successfully"
         except Exception as e:
+            self.logger.error(f"Error updating rows in Table ({table_name}) {sql} \n{e}")
             return False, f"Error updating rows in Table ({table_name})\n{e}"
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if db is not None:
+                db.close()
 
     def delete_row(self, table_name: str, where_items: list):
+        cursor = None
+        db = None
+
         try:
+            db = self.get_connection()
             where_clause = self.generate_where_clause(where_items)
             sql = f"DELETE FROM {table_name} WHERE {where_clause}"
-            mycursor = self.mydb.cursor()
-            mycursor.execute(sql)
-            self.mydb.commit()
+            cursor = db.cursor()
+            cursor.execute(sql)
+            db.commit()
+            self.logger.info(f"Row deleted successfully {sql}")
             return True, f"Row deleted successfully"
         except Exception as e:
+            self.logger.error(f"Error deleting rows in Table ({table_name}) {sql} \n{e}")
             return False, f"Error deleting rows in Table ({table_name})\n{e}"
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if db is not None:
+                db.close()
 
     def close(self):
-        self.mydb.close()
-        return True, "Connection closed successfully"
+        try:
+            db = self.get_connection()
+            db.close()
+            return True, "Connection closed successfully"
+        except Exception as e:
+            return False, f"Error closing connection\n{e}"
 

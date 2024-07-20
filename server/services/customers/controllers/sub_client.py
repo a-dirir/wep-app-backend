@@ -1,10 +1,13 @@
 from datetime import datetime
-from server.common.crud import SimpleCRUD
+from server.common.crud import CRUD
+from server.util import get_logger
 
 
-class SubClient(SimpleCRUD):
-    def __init__(self, table_name: str):
-        super().__init__(table_name)
+class SubClient(CRUD):
+    def __init__(self):
+        self.name = 'SubClient'
+        super().__init__(self.name)
+        self.logger = get_logger(f"CRUD_{self.name}")
 
     @staticmethod
     def get_quarter(date: str):

@@ -7,14 +7,26 @@ class Authenticator:
         self.table_name = 'iam_users'
         self.db = db
         self.cache = {}
-        self.logger = get_logger(__name__)
+        self.customers = []
+        self.logger = get_logger(self.__class__.__name__)
+
+        self.set_customers()
+
+    def set_customers(self):
+        success, results = self.db.get_rows(table_name='sub_clients', columns=['Sub_Client_ID', 'Name'])
+        if not success:
+            self.customers = []
+        else:
+            self.customers = results
+
+    def get_customers(self):
+        return self.customers
 
     def is_authentic(self, user_credential: dict):
         username = user_credential.get('username')
         password = user_credential.get('password')
 
         conditions = {'email': username}
-
         if username in self.cache:
             salt = self.cache[username].get('salt')
             true_password_hashed = self.cache[username].get('password_hashed')

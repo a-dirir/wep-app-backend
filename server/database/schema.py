@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 """
 This file contains the schema of the database. It is used to manage the database tables.
 The schema is a dictionary of tables, where each table is a dictionary of columns.
@@ -23,7 +25,7 @@ schema_template = {
 }
 """
 
-schema = {
+schema = OrderedDict({
     "iam_users": {
         "columns": {
             "email": {
@@ -63,7 +65,7 @@ schema = {
                 "not_null": True,
                 "index": True
             },
-        }
+        },
     },
     "sub_clients": {
         "columns": {
@@ -74,7 +76,7 @@ schema = {
             },
             "Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "clients.Client_ID=>clients.Name",
+                "foreign_key": "clients.Client_ID|clients.Name",
                 "not_null": True
             },
             "Name": {
@@ -105,7 +107,7 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True
             },
             "Account_Manager": {
@@ -150,7 +152,7 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True
             },
             "URL": {
@@ -168,7 +170,7 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True
             },
             "Account_ID": {
@@ -193,7 +195,7 @@ schema = {
         "columns": {
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True
             },
             "Subscription_ID": {
@@ -276,7 +278,7 @@ schema = {
             },
             "Sub_Client_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "sub_clients.Sub_Client_ID=>sub_clients.Name",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True
             },
             "Status": {
@@ -370,5 +372,23 @@ schema = {
                 "not_null": True
             },
         }
+    },
+    "newrelic_organizations": {
+        "columns": {
+            "Sub_Client_ID": {
+                "type": "VARCHAR(100)",
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
+                "not_null": True
+            },
+            "Organization_ID": {
+                "type": "VARCHAR(100)",
+                "index": True,
+                "not_null": True
+            },
+            "Organization_NAME": {
+                "type": "VARCHAR(100)",
+                "not_null": True
+            },
+        }
     }
-}
+})

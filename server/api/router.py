@@ -1,6 +1,7 @@
 from server.api.authorizer import Authorizer
 from server.services.customers.service import Customers
 from server.services.iam.service import IAM
+from server.services.monitoring.service import Monitoring
 from server.util import get_logger
 
 
@@ -9,6 +10,7 @@ class Router:
         self.services = {
             'IAM': IAM(),
             'Customers': Customers(),
+            'Monitoring': Monitoring()
         }
         self.authorizer = Authorizer()
 

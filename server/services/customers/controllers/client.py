@@ -1,9 +1,12 @@
-from server.common.crud import SimpleCRUD
+from server.common.crud import CRUD
+from server.util import get_logger
 
 
-class Client(SimpleCRUD):
-    def __init__(self, table_name: str):
-        super().__init__(table_name)
+class Client(CRUD):
+    def __init__(self):
+        self.name = 'Client'
+        super().__init__(self.name)
+        self.logger = get_logger(f"CRUD_{self.name}")
 
     def on_create(self, data: dict, db):
         # check if Name is missing
