@@ -5,28 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/triggered.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/api/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/mappings.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/mappings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/jira_connector/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/jiraservice/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/newrelic/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/jiraservice/incident.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/jira_connector/incident.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/newrelic/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/infrastructure/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/newrelic/accounts.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/infrastructure/controllers/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/newrelic/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/newrelic/agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/newrelic/incidents.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/newrelic/incident.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/controllers/newrelic/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/connectors/newrelic/loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/monitoring/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/infrastructure/service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
