@@ -1,9 +1,8 @@
 import os
 import datetime
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, send_from_directory
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask import send_from_directory
 from dotenv import load_dotenv
 
 
@@ -126,22 +125,25 @@ def application():
 
     # return a flask response object to the client
     if status_code == 200:
+        logger.info(f"Success: {msg}")
         return jsonify(msg=msg), status_code
     else:
-        print(msg)
+        logger.error(f"Error: {msg}")
         return jsonify(msg['error']), status_code
 
 
-# @app.route('/', methods=['GET'])
-# def index():
-#     absolute_path = os.path.abspath('static_files')
-#     return send_from_directory(absolute_path, 'index.html')
-#
-#
-# @app.route('/<path:path>')
-# def serve_static(path):
-#     return send_from_directory('static_files', path)
+@app.route('/', methods=['GET'])
+def index():
+    absolute_path = os.path.abspath('static_files')
+    return send_from_directory(absolute_path, 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('static_files', path)
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=80)
+
+

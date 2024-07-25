@@ -1,21 +1,19 @@
 from datetime import datetime
-
-from server.common.controller import BaseController
-from server.services.monitoring.controllers.newrelic.agent import NewRelicAgent
 import re
 import ast
 
+from server.common.controller import BaseController
+from server.connectors.newrelic.agent import NewRelicAgent
 
-class NewRelicAlertsIncidents(BaseController):
+
+class NewRelicIncident(BaseController):
     def __init__(self):
         super().__init__()
         self.agent = NewRelicAgent()
-        self.methods = ['list']
+        self.methods = ['list', 'view']
+        self.accounts = []
 
     def list(self, payload: dict):
-        db = payload['db']
-        print(payload)
-
         account_id = payload['data']['account_id']
 
         incidents = self.agent.get_alert_incidents(account_id)
@@ -55,4 +53,18 @@ class NewRelicAlertsIncidents(BaseController):
 
         return processed_incidents
 
+    def view(self, payload: dict):
+        title = payload['data']['title']
 
+        incidents, status_code = self.list(payload)
+
+        if status_code == 400:
+            return 'Failed to get incidents', 400
+
+        incidents = incidents['data']
+
+        for incident in incidents:
+            if incident['Title'] == title:
+                return incident, 200
+
+        return 'Incident not found', 404

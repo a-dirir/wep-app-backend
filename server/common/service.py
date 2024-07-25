@@ -10,6 +10,7 @@ class BaseService:
             return {'error': f"The controller {controller} is invalid for the service {self.name}"}, 400
 
         try:
+            payload['service'] = self.name
             payload['controller'] = controller
 
             if controller in self.controllers:

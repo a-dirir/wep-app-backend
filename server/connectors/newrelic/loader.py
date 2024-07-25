@@ -1,4 +1,4 @@
-from server.services.monitoring.controllers.newrelic.agent import NewRelicAgent
+from server.connectors.newrelic.agent import NewRelicAgent
 
 
 class NewRelicLoader:
@@ -48,7 +48,7 @@ class NewRelicLoader:
 
         newrelic_policies = self.agent.get_policies(account_id)
         if newrelic_policies is None:
-            return 'Failed to get alert policies', 400
+            return 'Failed to get alarm policies', 400
 
         # check if there are any new policies
         for newrelic_policy in newrelic_policies:
@@ -63,7 +63,7 @@ class NewRelicLoader:
                 if not success:
                     return False, results
 
-        return 'Loaded newrelic alert policies successfully', 200
+        return 'Loaded newrelic alarm policies successfully', 200
 
     def LoadAlertConditions(self, payload: dict):
         db = payload['db']
@@ -80,7 +80,7 @@ class NewRelicLoader:
 
         newrelic_conditions = self.agent.get_all_alerts_conditions(account_id, policy_id)
         if newrelic_conditions is None:
-            return 'Failed to get alert conditions', 400
+            return 'Failed to get alarm conditions', 400
 
         # check if there are any new conditions
         for newrelic_condition in newrelic_conditions:
@@ -95,7 +95,7 @@ class NewRelicLoader:
 
                 condition_details = self.agent.get_alert_condition_details(account_id, newrelic_condition['id'])
                 if condition_details is None:
-                    return 'Failed to get alert condition details', 400
+                    return 'Failed to get alarm condition details', 400
 
                 new_condition['Condition_Operator'] = condition_details['terms'][0]['operator']
                 new_condition['Condition_Threshold'] = condition_details['terms'][0]['threshold']
@@ -105,4 +105,4 @@ class NewRelicLoader:
                 if not success:
                     return False, results
 
-        return 'Loaded newrelic alert conditions successfully', 200
+        return 'Loaded newrelic alarm conditions successfully', 200

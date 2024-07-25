@@ -84,7 +84,7 @@ class CRUD(BaseController):
     def list(self, payload: dict):
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['controller']]
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         success, results = db.get_rows(table_name=table_name, columns=self.client_side_columns[table_name])
         if not success:
@@ -104,7 +104,7 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['controller']]
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         data = self.remove_extra_columns(table_name, data)
 
@@ -132,7 +132,7 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['controller']]
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         data['new'] = self.remove_extra_columns(table_name, data['new'])
         data['old'] = self.remove_extra_columns(table_name, data['old'])
@@ -169,7 +169,7 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['controller']]
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         for key in self.index_keys[table_name]:
             if data.get(key) is None:
@@ -196,7 +196,7 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['controller']]
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys[table_name], data, db)
         if not success:

@@ -7,7 +7,7 @@ class SubClient(CRUD):
     def __init__(self):
         self.name = 'SubClient'
         super().__init__(self.name)
-        self.logger = get_logger(f"CRUD_{self.name}")
+        self.logger = get_logger(__class__.__name__)
 
     @staticmethod
     def get_quarter(date: str):

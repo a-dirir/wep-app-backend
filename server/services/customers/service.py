@@ -16,4 +16,4 @@ class Customers(BaseService):
             'Opportunity': Opportunity(),
             '*': CRUD(self.name)
         }
-        self.allowed_controllers = list(controller_db_mappings.keys())
+        self.allowed_controllers = list(controller_db_mappings[self.name].keys())

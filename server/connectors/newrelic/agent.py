@@ -265,3 +265,23 @@ class NewRelicAgent:
 
         return ai_incidents
 
+    def query_data(self, account_id: str, query_statement: str):
+        query = f"""
+            {{
+              actor {{
+                account(id: {account_id}) {{
+                  nrql(query: "{query_statement}") {{
+                    results
+                  }}
+                }}
+              }}
+            }}
+        """
+
+        results = self.run(query)
+        if results is None or results.get('errors') is not None:
+            return None
+
+        results = results['data']['actor']['account']['nrql']['results']
+
+        return results

@@ -6,7 +6,7 @@ class Client(CRUD):
     def __init__(self):
         self.name = 'Client'
         super().__init__(self.name)
-        self.logger = get_logger(f"CRUD_{self.name}")
+        self.logger = get_logger(__class__.__name__)
 
     def on_create(self, data: dict, db):
         # check if Name is missing
