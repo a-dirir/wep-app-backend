@@ -1,10 +1,12 @@
+import json
 import os
 import datetime
-from flask import Flask, request, jsonify, make_response, send_from_directory
+
+import boto3
+from flask import Flask, request, jsonify, make_response, send_from_directory, session
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from dotenv import load_dotenv
-
 
 from server.api.router import Router
 from server.api.authenticator import Authenticator
@@ -18,27 +20,59 @@ class User(UserMixin):
         self.username = _id
 
 
-def load_db():
-    return MySQLDB()
+def load_env():
+    load_dotenv("config.env")
 
 
-load_dotenv("config.env")
-app = Flask(__name__, static_folder="static_files", template_folder="static_files")
-login_manager = LoginManager()
-app.config["SECRET_KEY"] = os.urandom(24)
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['REMEMBER_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
-app.config['REMEMBER_COOKIE_SECURE'] = True
-login_manager.init_app(app)
-login_manager.session_protection = "strong"
+def load_aws_env():
+    try:
+        secret_name = "crm-backend"
+        region_name = "me-central-1"
 
-cors = CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+        boto3_session = boto3.session.Session()
+        client = boto3_session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
 
-db = load_db()
-router = Router()
-authenticator = Authenticator(db)
-logger = get_logger(__name__)
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+
+        secret = json.loads(get_secret_value_response["SecretString"])
+
+        for key, value in secret.items():
+            os.environ[key] = str(value)
+
+        return True
+    except Exception as e:
+        return False
+
+
+def setup():
+    success = load_aws_env()
+    if not success:
+        load_env()
+
+    app_local = Flask(__name__, static_folder="static_files", template_folder="static_files")
+    login_manager_local = LoginManager()
+    app_local.config.update(
+        SECRET_KEY=os.urandom(24),
+        SESSION_COOKIE_SAMESITE='None',
+        REMEMBER_COOKIE_SAMESITE='None',
+        SESSION_COOKIE_SECURE=True,
+        REMEMBER_COOKIE_SECURE=True
+    )
+
+    login_manager_local.init_app(app_local)
+    login_manager_local.session_protection = "strong"
+
+    cors = CORS(app_local, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+
+    return app_local, login_manager_local
+
+
+app, login_manager = setup()
 
 
 @login_manager.user_loader
@@ -48,14 +82,6 @@ def user_loader(username):
 
 @app.route('/login', methods=['POST'])
 def login():
-    if current_user.is_authenticated:
-        user_info = {'username': current_user.username,
-                     'group': authenticator.get_user_group(current_user.username),
-                     'customers': authenticator.get_customers(),
-                     }
-
-        return jsonify(msg={'user_info': user_info, 'customers': authenticator.get_customers()}), 200
-
     username = request.headers.get('username')
     password = request.headers.get('password')
 
@@ -69,8 +95,7 @@ def login():
     login_user(User(username), remember=True, duration=datetime.timedelta(seconds=24 * 60 * 60))
 
     user_info = {'username': username,
-                 'group': authenticator.get_user_group(username),
-                 'customers': authenticator.get_customers(),
+                 'group': authenticator.get_user_group(username)
                  }
 
     response = make_response(
@@ -80,6 +105,7 @@ def login():
     return response
 
 
+@login_required
 @app.route('/status', methods=['POST'])
 def status():
     if current_user.is_authenticated:
@@ -132,18 +158,11 @@ def application():
         return jsonify(msg['error']), status_code
 
 
-@app.route('/', methods=['GET'])
-def index():
-    absolute_path = os.path.abspath('static_files')
-    return send_from_directory(absolute_path, 'index.html')
-
-
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('static_files', path)
-
-
 if __name__ == '__main__':
+    db = MySQLDB()
+    router = Router()
+    authenticator = Authenticator(db)
+    logger = get_logger(__name__)
     app.run(debug=True, port=80)
 
 

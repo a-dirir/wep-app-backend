@@ -8,6 +8,7 @@ class Opportunity(CRUD):
         self.name = 'Opportunity'
         super().__init__(self.name)
         self.logger = get_logger(__class__.__name__)
+        self.table_name = 'opportunities'
 
     @staticmethod
     def get_quarter(date:str):

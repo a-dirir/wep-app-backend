@@ -30,8 +30,7 @@ schema = OrderedDict({
         "columns": {
             "email": {
               "type": "VARCHAR(128)",
-              "primary_key": True,
-              "unique": True,
+              "index": True,
               "not_null": True
             },
             "name": {
@@ -39,17 +38,18 @@ schema = OrderedDict({
             },
             "user_group": {
               "type": "VARCHAR(64)",
-              "unique": True,
               "not_null": True,
               "allowed_values": ["user", "admin"]
             },
             "salt": {
                 "type": "VARCHAR(256)",
-                "not_null": True
+                "not_null": True,
+                "server_only": True,
             },
             "password_hashed": {
                 "type": "VARCHAR(256)",
-                "not_null": True
+                "not_null": True,
+                "server_only": True,
             }
         },
     },
@@ -112,10 +112,12 @@ schema = OrderedDict({
             },
             "Account_Manager": {
                 "type": "VARCHAR(80)",
+                "foreign_key": "ms_account_managers.name",
                 "not_null": True
             },
             "MS_Focal_Point": {
                 "type": "VARCHAR(80)",
+                "foreign_key": "ms_focal_points.name",
                 "not_null": True
             },
             "Domain": {
@@ -147,6 +149,42 @@ schema = OrderedDict({
                 "not_null": True
             },
         }
+    },
+    "ms_focal_points": {
+        "columns": {
+            "email": {
+              "type": "VARCHAR(128)",
+              "index": True,
+              "not_null": True
+            },
+            "name": {
+              "type": "VARCHAR(64)"
+            },
+            "title": {
+              "type": "VARCHAR(64)"
+            },
+            "phone_number": {
+              "type": "VARCHAR(64)"
+            },
+        },
+    },
+    "ms_account_managers": {
+        "columns": {
+            "email": {
+              "type": "VARCHAR(128)",
+              "index": True,
+              "not_null": True
+            },
+            "name": {
+              "type": "VARCHAR(64)"
+            },
+            "title": {
+              "type": "VARCHAR(64)"
+            },
+            "phone_number": {
+              "type": "VARCHAR(64)"
+            },
+        },
     },
     "clients_url": {
         "columns": {
@@ -311,12 +349,12 @@ schema = OrderedDict({
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "products.Product_ID",
+                "foreign_key": "products.Product_ID|products.Name",
                 "not_null": True
             },
             "Addon_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "addons.Addon_ID",
+                "foreign_key": "addons.Addon_ID|addons.Name",
                 "not_null": True
             },
         }
@@ -337,12 +375,12 @@ schema = OrderedDict({
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "products.Product_ID",
+                "foreign_key": "products.Product_ID|products.Name",
                 "not_null": True
             },
             "Addon_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "addons.Addon_ID",
+                "foreign_key": "addons.Addon_ID|addons.Name",
                 "not_null": True
             },
         }
@@ -363,12 +401,12 @@ schema = OrderedDict({
             },
             "Product_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "products.Product_ID",
+                "foreign_key": "products.Product_ID|products.Name",
                 "not_null": True
             },
             "Addon_ID": {
                 "type": "VARCHAR(100)",
-                "foreign_key": "addons.Addon_ID",
+                "foreign_key": "addons.Addon_ID|addons.Name",
                 "not_null": True
             },
         }

@@ -51,6 +51,7 @@ class SchemaController:
 
             success, results = db.get_rows(table_name=table_name, columns=foreign_columns_names,
                                            distinct="DISTINCT", return_type="list")
+            # print(results, foreign_column, origins)
             if not success:
                 return False, results
 
@@ -66,7 +67,10 @@ class SchemaController:
             if len(column_values[0]) > 1:
                 for row in records:
                     # replace foreign key with value
-                    row[column_name] = [item[0] for item in column_values if item[1] == row[column_name]][0]
+                    try:
+                        row[column_name] = [item[0] for item in column_values if item[1] == row[column_name]][0]
+                    except Exception as e:
+                        continue
 
             columns_distinct_values[column_name] = [item[0] for item in column_values]
 

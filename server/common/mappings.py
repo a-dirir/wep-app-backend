@@ -3,6 +3,8 @@ controller_db_mappings = {
         'Client': 'clients',
         'SubClient': 'sub_clients',
         'Contact': 'clients_contacts',
+        'FocalPoint': 'ms_focal_points',
+        'AccountManager': 'ms_account_managers',
         'Synthetic': 'clients_url',
         'AwsAccount': 'aws_accounts',
         'AzureAccount': 'azure_accounts',
@@ -13,5 +15,8 @@ controller_db_mappings = {
         'M365Opportunity': 'm365_opportunity_details',
         'Addon': 'addons',
         'Product': 'products',
-    }
+    },
+    'IAM': {
+        'User': 'iam_users'
+    },
 }

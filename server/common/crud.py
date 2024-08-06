@@ -107,13 +107,15 @@ class CRUD(BaseController):
         table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         data = self.remove_extra_columns(table_name, data)
-
+        print(11, data)
         success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys[table_name], data, db)
         if not success:
             return {'error': data}, 400
         self.logger.info(f"Success: replace destination with source in {table_name} for create")
 
         data = self.on_create(data, db)
+
+        print(12, data)
 
         # validate data
         success, data = self.validate_data(table_name, data)
@@ -126,7 +128,13 @@ class CRUD(BaseController):
             return {'error': results}, 400
         self.logger.info(f"Success: insert row in {table_name}")
 
-        return results, 200
+        created_data = {col: data[col] for col in self.get_client_side_columns(table_name)}
+
+        # get foreign keys data
+        success, results = self.schema_controller.replace_source_with_destination(self.foreign_keys[table_name],
+                                                                                  [created_data], db)
+
+        return {'data': results}, 200
 
     def update(self, payload: dict):
         data = payload['data']
@@ -163,7 +171,13 @@ class CRUD(BaseController):
             return {'error': results}, 400
         self.logger.info(f"Success: update row in {table_name}")
 
-        return results, 200
+        updated_data = {col: data[col] for col in self.get_client_side_columns(table_name)}
+
+        # get foreign keys data
+        success, results = self.schema_controller.replace_source_with_destination(self.foreign_keys[table_name],
+                                                                                  [updated_data], db)
+
+        return {'data': results}, 200
 
     def delete(self, payload: dict):
         data = payload['data']
@@ -184,12 +198,10 @@ class CRUD(BaseController):
 
         return results, 200
 
-    @staticmethod
-    def on_create(data: dict, db):
+    def on_create(self, data: dict, db):
         return data
 
-    @staticmethod
-    def on_update(data: dict, db):
+    def on_update(self, data: dict, db):
         return data
 
     def showLinkedServices(self, payload: dict):

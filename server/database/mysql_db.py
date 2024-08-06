@@ -15,13 +15,14 @@ class MySQLDB:
             user=environ.get("MYSQL_USER"),
             password=environ.get("MYSQL_PASSWORD"),
             database=environ.get("MYSQL_DATABASE_NAME"),
-            ssl_ca='crm-ca.pem'
+            # ssl_ca='crm-ca.pem'
         )
         
         self.logger = get_logger(__name__)
 
     def get_connection(self):
         return self.pool.get_connection()
+
 
     @staticmethod
     def generate_where_clause(where_items: list):
@@ -79,10 +80,8 @@ class MySQLDB:
 
             if return_type == "dict":
                 results = self.convert_results_to_dict(results, columns)
-            
-            self.logger.info(f"Rows fetched successfully {sql}")
-            return True, results
 
+            return True, results
         except Exception as e:
             self.logger.error(f"Error fetching rows from Table ({table_name}) {sql} \n{e}")
             return False, f"Error fetching data from database"
@@ -104,7 +103,6 @@ class MySQLDB:
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
-            self.logger.info(f"Row inserted successfully {sql}")
             return True, f"Row inserted successfully"
         except Exception as e:
             self.logger.error(f"Error inserting rows into Table ({table_name}) {sql} \n{e}")
@@ -134,7 +132,6 @@ class MySQLDB:
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
-            self.logger.info(f"Row updated successfully {sql}")
             return True, f"Row updated successfully"
         except Exception as e:
             self.logger.error(f"Error updating rows in Table ({table_name}) {sql} \n{e}")
@@ -156,7 +153,6 @@ class MySQLDB:
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
-            self.logger.info(f"Row deleted successfully {sql}")
             return True, f"Row deleted successfully"
         except Exception as e:
             self.logger.error(f"Error deleting rows in Table ({table_name}) {sql} \n{e}")

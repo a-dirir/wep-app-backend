@@ -27,19 +27,15 @@ class Authenticator:
         password = user_credential.get('password')
 
         conditions = {'email': username}
-        if username in self.cache:
-            salt = self.cache[username].get('salt')
-            true_password_hashed = self.cache[username].get('password_hashed')
-        else:
-            success, results = self.db.get_rows(table_name=self.table_name, where_items=[conditions])
-            if not success or len(results) == 0:
-                return False
 
-            true_password_hashed = results[0].get('password_hashed')
-            salt = results[0].get('salt')
+        success, results = self.db.get_rows(table_name=self.table_name, where_items=[conditions])
+        if not success or len(results) == 0:
+            return False
 
-            self.cache[username] = {'salt': salt, 'group': results[0].get('user_group'),
-                                    'password_hashed': true_password_hashed}
+        true_password_hashed = results[0].get('password_hashed')
+        salt = results[0].get('salt')
+
+        self.cache[username] = {'group': results[0].get('user_group')}
 
         if not self.verify_password(password, true_password_hashed, salt):
             return False
