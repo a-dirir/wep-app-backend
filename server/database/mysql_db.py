@@ -15,7 +15,7 @@ class MySQLDB:
             user=environ.get("MYSQL_USER"),
             password=environ.get("MYSQL_PASSWORD"),
             database=environ.get("MYSQL_DATABASE_NAME"),
-            # ssl_ca='crm-ca.pem'
+            ssl_ca='crm-ca.pem'
         )
         
         self.logger = get_logger(__name__)
