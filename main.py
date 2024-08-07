@@ -69,10 +69,15 @@ def setup():
 
     cors = CORS(app_local, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
-    return app_local, login_manager_local
+    db_local = MySQLDB()
+    router_local = Router()
+    authenticator_local = Authenticator(db_local)
+    logger_local = get_logger(__name__)
+
+    return app_local, login_manager_local, db_local, router_local, authenticator_local, logger_local
 
 
-app, login_manager = setup()
+app, login_manager, db, router, authenticator, logger = setup()
 
 
 @login_manager.user_loader
@@ -88,15 +93,13 @@ def login():
     if username is None or password is None:
         return jsonify(msg={'error': 'Missing username or password'}), 400
 
-    payload: dict = {'username': username, 'password': password}
+    payload = {'username': username, 'password': password}
     if not authenticator.is_authentic(payload):
         return jsonify(msg={'error': 'Invalid username or password'}), 400
 
     login_user(User(username), remember=True, duration=datetime.timedelta(seconds=24 * 60 * 60))
 
-    user_info = {'username': username,
-                 'group': authenticator.get_user_group(username)
-                 }
+    user_info = {'username': username, 'group': authenticator.get_user_group(username)}
 
     response = make_response(
         jsonify(msg={'user_info': user_info, 'customers': authenticator.get_customers()})
@@ -110,8 +113,7 @@ def login():
 def status():
     if current_user.is_authenticated:
         user_info = {'username': current_user.username,
-                     'group': authenticator.get_user_group(current_user.username),
-                     }
+                     'group': authenticator.get_user_group(current_user.username)}
 
         return jsonify(msg={'user_info': user_info, 'customers': authenticator.get_customers()}), 200
     else:
@@ -136,7 +138,7 @@ def application():
         return jsonify(msg='User is not authenticated'), 401
 
     # load json data from request
-    payload: dict = request.get_json()
+    payload = request.get_json()
     payload['db'] = db
     payload['router'] = router
 
@@ -155,14 +157,8 @@ def application():
         return jsonify(msg=msg), status_code
     else:
         logger.error(f"Error: {msg}")
-        return jsonify(msg['error']), status_code
+        return jsonify(msg={'error': msg}), status_code
 
 
 if __name__ == '__main__':
-    db = MySQLDB()
-    router = Router()
-    authenticator = Authenticator(db)
-    logger = get_logger(__name__)
     app.run(debug=True, port=80)
-
-
