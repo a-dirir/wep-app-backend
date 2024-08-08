@@ -6,13 +6,18 @@ class SchemaController:
         self.dependency_graph = self.build_dependencies_graph()
 
     @staticmethod
-    def extract_indexes(table_name: str):
+    def get_index_keys(table_name: str):
         index_keys = []
-        foreign_keys = {}
         for column_name, column in schema[table_name]['columns'].items():
             if column.get('index', False):
                 index_keys.append(column_name)
 
+        return index_keys
+
+    @staticmethod
+    def get_foreign_keys(table_name: str):
+        foreign_keys = {}
+        for column_name, column in schema[table_name]['columns'].items():
             if column.get('foreign_key', False):
                 if column['foreign_key'].find('|') != -1:
                     source, destination = column['foreign_key'].split('|')
@@ -28,57 +33,102 @@ class SchemaController:
                     'destination_column_name': destination_column_name
                 }
 
-        return index_keys, foreign_keys
+        return foreign_keys
 
     @staticmethod
-    def get_client_side_columns(table_name: str):
-        get_client_side_columns = []
+    def get_columns_permissions(table_name: str):
+        columns_permissions = {'view': [], 'create': [], 'edit': []}
 
         for column_name, column in schema[table_name]['columns'].items():
-            if not column.get('server_only', False):
-                get_client_side_columns.append(column_name)
+            if column.get('server_only') is None:
+                for permission in columns_permissions.keys():
+                    columns_permissions[permission].append(column_name)
+            else:
+                for permission in column['server_only']:
+                    if not column['server_only'][permission]:
+                        columns_permissions[permission].append(column_name)
 
-        return get_client_side_columns
+        return columns_permissions
 
-    def replace_source_with_destination(self, foreign_keys_config: dict, records: list, db):
-        columns_distinct_values = {}
-        for foreign_column, origins in foreign_keys_config.items():
+    @staticmethod
+    def remove_extra_columns(row: dict, allowed_columns: list):
+        new_row = {}
+        for key in row.keys():
+            if key in allowed_columns:
+                new_row[key] = row[key]
+        return new_row
+
+    def add_foreign_keys_aliases(self, foreign_keys: dict, records: list, db, mode="replace"):
+        options = {}
+        linked_columns = {}
+
+        for foreign_column, origins in foreign_keys.items():
             table_name = origins['table_name']
-            foreign_columns_names = [origins['destination_column_name']]
-
             if origins['source_column_name'] != origins['destination_column_name']:
-                foreign_columns_names.append(origins['source_column_name'])
+                foreign_columns_names = [origins['source_column_name'], origins['destination_column_name']]
+                linked_columns[origins['source_column_name']] = f"{table_name}_{origins['destination_column_name']}"
+            else:
+                foreign_columns_names = [origins['source_column_name']]
+                linked_columns[origins['source_column_name']] = f"{origins['source_column_name']}"
 
             success, results = db.get_rows(table_name=table_name, columns=foreign_columns_names,
                                            distinct="DISTINCT", return_type="list")
-            # print(results, foreign_column, origins)
             if not success:
                 return False, results
 
-            columns_distinct_values[foreign_column] = results
+            options[foreign_column] = self.populate_options(results, foreign_columns_names)
 
-        columns_distinct_values, data = self.merge_columns(columns_distinct_values, records)
+        print(options, linked_columns)
+        merged_records = self.merge_columns(options, linked_columns, records)
 
-        return True, {'options': columns_distinct_values, 'data': records}
-
-    @staticmethod
-    def merge_columns(columns_distinct_values, records: list):
-        for column_name, column_values in columns_distinct_values.items():
-            if len(column_values[0]) > 1:
-                for row in records:
-                    # replace foreign key with value
-                    try:
-                        row[column_name] = [item[0] for item in column_values if item[1] == row[column_name]][0]
-                    except Exception as e:
-                        continue
-
-            columns_distinct_values[column_name] = [item[0] for item in column_values]
-
-        return columns_distinct_values, records
+        return True, {'options': options, 'linked_columns': linked_columns, 'data': merged_records}
 
     @staticmethod
-    def replace_destination_with_source(foreign_keys_config: dict, record: dict, db):
-        for foreign_column, origins in foreign_keys_config.items():
+    def populate_options(results: list, foreign_columns_names: list):
+        options = {}
+
+        if len(results) == 0:
+            return options
+
+        if len(foreign_columns_names) == 1:
+            for result in results:
+                options[result[0]] = result[0]
+
+        else:
+            for result in results:
+                options[result[0]] = result[1]
+
+        return options
+
+    @staticmethod
+    def merge_columns(options, linked_columns, records: list, mode: str = "add"):
+        new_records = []
+        for record in records:
+            new_record = record.copy()
+
+            for foreign_column, linked_column in linked_columns.items():
+                if foreign_column == linked_column:
+                    continue
+
+                source_value = record[foreign_column]
+                if options[foreign_column].get(source_value) is None:
+                    continue
+
+                destination_value = options[foreign_column][source_value]
+
+                if mode == "replace":
+                    new_record[foreign_column] = destination_value
+
+                elif mode == "add":
+                    new_record[linked_column] = destination_value
+
+            new_records.append(new_record)
+
+        return new_records
+
+    @staticmethod
+    def remove_foreign_keys_aliases(foreign_keys: dict, record: dict, db):
+        for foreign_column, origins in foreign_keys.items():
             if record.get(foreign_column) is None or origins['source_column_name'] == origins['destination_column_name']:
                 continue
             else:
@@ -144,10 +194,10 @@ class SchemaController:
 
         return graph
 
-    def get_linked_records(self, table_name: str, data: dict, foreign_keys: dict, client_side_columns: dict, db):
+    def get_linked_records(self, table_name: str, data: dict, foreign_keys: dict, columns_permissions: dict, db):
         sequence = [f"{table_name}"]
         rows = {f"{table_name}": [data]}
-        columns_order = {f"{table_name}": client_side_columns[table_name]}
+        columns_order = {f"{table_name}": columns_permissions[table_name]['view']}
         dependency_graph = self.get_dependency_graph(table_name)
 
         for dependency in dependency_graph:
@@ -168,14 +218,41 @@ class SchemaController:
 
                     if f"{child_table}" not in sequence:
                         sequence.append(f"{child_table}")
-                        columns_order[f"{child_table}"] = client_side_columns[child_table]
+                        columns_order[f"{child_table}"] = columns_permissions[child_table]['view']
                 else:
                     continue
 
         for table_name in rows.keys():
             if len(foreign_keys[table_name]) != 0:
-                success, results = self.replace_source_with_destination(foreign_keys[table_name], rows[table_name], db)
+                success, results = self.add_foreign_keys_aliases(foreign_keys[table_name],
+                                                                 rows[table_name], db, 'replace')
                 if success:
                     rows[table_name] = results['data']
 
+        sequence, rows, columns_order = self.format_linked_records(sequence, rows, columns_order)
+
         return True, {"tables_sequence": sequence, "data": rows, "columns_order": columns_order}
+
+    @staticmethod
+    def format_linked_records(sequence: list, data: dict, columns_order: dict):
+        linked_records = {}
+        new_columns_order = {}
+        for table_name in data.keys():
+            table_label = schema[table_name]['label']
+            table_data = []
+            for row in data[table_name]:
+                new_row = {}
+                for column_name in columns_order[table_name]:
+                    column_label = schema[table_name]['columns'][column_name]['label']
+                    new_row[column_label] = row[column_name]
+
+                table_data.append(new_row)
+
+            linked_records[table_label] = table_data
+
+            new_columns_order[table_label] = [schema[table_name]['columns'][column_name]['label']
+                                             for column_name in columns_order[table_name]]
+
+        sequence = [schema[table_name]['label'] for table_name in sequence]
+
+        return sequence, linked_records, new_columns_order

@@ -1,3 +1,4 @@
+import time
 import mysql.connector
 import mysql.connector.pooling
 from server.database.schema import schema
@@ -7,22 +8,39 @@ from os import environ
 
 class MySQLDB:
     def __init__(self):
-        self.pool = mysql.connector.pooling.MySQLConnectionPool(
-            pool_name="crm_pool",
-            pool_size=10,
-            pool_reset_session=True,
-            host=environ.get("MYSQL_HOST"),
-            user=environ.get("MYSQL_USER"),
-            password=environ.get("MYSQL_PASSWORD"),
-            database=environ.get("MYSQL_DATABASE_NAME"),
-            ssl_ca='crm-ca.pem'
-        )
-        
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(__class__.__name__)
+        try:
+            self.pool = mysql.connector.pooling.MySQLConnectionPool(
+                pool_name="crm_pool",
+                pool_size=32,
+                pool_reset_session=True,
+                host=environ.get("MYSQL_HOST"),
+                user=environ.get("MYSQL_USER"),
+                password=environ.get("MYSQL_PASSWORD"),
+                database=environ.get("MYSQL_DATABASE_NAME"),
+                ssl_ca='crm-ca.pem'
+            )
+        except mysql.connector.Error as err:
+            self.logger.error(f"Error initializing connection pool: {err}")
+            self.pool = None
 
-    def get_connection(self):
-        return self.pool.get_connection()
+    def get_connection(self, retries=3, delay=3):
+        if not self.pool:
+            self.logger.error("Connection pool is not initialized")
+            return None
 
+        for _ in range(retries):
+            try:
+                connection = self.pool.get_connection()
+                if connection.is_connected():
+                    return connection
+            except mysql.connector.errors.PoolError as e:
+                self.logger.error(f"Connection pool exhausted. Retrying in {delay} seconds...")
+                time.sleep(delay)
+
+        self.logger.error(f"Error getting connection after retries {retries} with delay {delay} seconds")
+
+        return None
 
     @staticmethod
     def generate_where_clause(where_items: list):
@@ -63,13 +81,20 @@ class MySQLDB:
                  return_type: str = "dict"):
         cursor = None
         db = None
+        sql = ""
 
         try:
             db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
             if columns is None:
                 columns = list(schema[table_name]['columns'].keys())
+
             columns_str = ", ".join(columns)
+
             sql = f"SELECT {distinct} {columns_str} FROM {table_name}"
+
             if where_items is not None:
                 where_clause = self.generate_where_clause(where_items)
                 sql = f"{sql} WHERE {where_clause}"
@@ -82,8 +107,9 @@ class MySQLDB:
                 results = self.convert_results_to_dict(results, columns)
 
             return True, results
+
         except Exception as e:
-            self.logger.error(f"Error fetching rows from Table ({table_name}) {sql} \n{e}")
+            self.logger.error(f"Error fetching rows from Table ({table_name}) {sql} ::: {e}")
             return False, f"Error fetching data from database"
         finally:
             if cursor is not None:
@@ -91,21 +117,77 @@ class MySQLDB:
             if db is not None:
                 db.close()
 
-    def insert_row(self, table_name: str, row: dict):
+    def get_joined_rows(self, base_table: str, join_table: str, join_condition: str,
+                        base_columns: list = None, join_columns: list = None,
+                        where_items: list = None, distinct: str = "",
+                        return_type: str = "dict"):
         cursor = None
         db = None
+        sql = ""
 
         try:
             db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
+            if base_columns is None:
+                base_columns = list(schema[base_table]['columns'].keys())
+
+            if join_columns is None:
+                join_columns = list(schema[join_table]['columns'].keys())
+
+            base_columns_str = ", ".join([f"{base_table}.{col}" for col in base_columns])
+            join_columns_str = ", ".join([f"{join_table}.{col}" for col in join_columns])
+
+            columns_str = ", ".join([base_columns_str, join_columns_str])
+
+            sql = f"SELECT {distinct} {columns_str} FROM {base_table} JOIN {join_table} ON {join_condition}"
+
+            if where_items is not None:
+                where_clause = self.generate_where_clause(where_items)
+                sql = f"{sql} WHERE {where_clause}"
+
+            cursor = db.cursor()
+            cursor.execute(sql)
+            results = cursor.fetchall()
+
+            if return_type == "dict":
+                columns = base_columns + join_columns
+                results = self.convert_results_to_dict(results, columns)
+
+            return True, results
+
+        except Exception as e:
+            return False, str(e)
+
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
+
+    def insert_row(self, table_name: str, row: dict):
+        cursor = None
+        db = None
+        sql = ""
+
+        try:
+            db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
             keys = ", ".join(row.keys())
             values = tuple(row.values())
+
             sql = f"INSERT INTO {table_name} ({keys}) VALUES {values}"
+
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
+
             return True, f"Row inserted successfully"
         except Exception as e:
-            self.logger.error(f"Error inserting rows into Table ({table_name}) {sql} \n{e}")
+            self.logger.error(f"Error inserting rows into Table ({table_name}) {sql} ::: {e}")
             return False, f"Error inserting rows into database"
         finally:
             if cursor is not None:
@@ -116,25 +198,31 @@ class MySQLDB:
     def update_row(self, table_name: str, row: dict, where_items: list):
         cursor = None
         db = None
+        sql = ""
 
         try:
             db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
             set_clause = ""
             for key, value in row.items():
                 if value[0] != "'" and value[-1] != "'":
                     value = f"'{value}'"
-
                 set_clause = f"{set_clause}{key} = {value}, "
             set_clause = set_clause[:-2]
 
             where_clause = self.generate_where_clause(where_items)
+
             sql = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause};"
+
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
+
             return True, f"Row updated successfully"
         except Exception as e:
-            self.logger.error(f"Error updating rows in Table ({table_name}) {sql} \n{e}")
+            self.logger.error(f"Error updating rows in Table ({table_name}) {sql} ::: {e}")
             return False, f"Error updating rows in Table ({table_name})\n{e}"
         finally:
             if cursor is not None:
@@ -145,17 +233,24 @@ class MySQLDB:
     def delete_row(self, table_name: str, where_items: list):
         cursor = None
         db = None
+        sql = ""
 
         try:
             db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
             where_clause = self.generate_where_clause(where_items)
+
             sql = f"DELETE FROM {table_name} WHERE {where_clause}"
+
             cursor = db.cursor()
             cursor.execute(sql)
             db.commit()
+
             return True, f"Row deleted successfully"
         except Exception as e:
-            self.logger.error(f"Error deleting rows in Table ({table_name}) {sql} \n{e}")
+            self.logger.error(f"Error deleting rows in Table ({table_name}) {sql} ::: {e}")
             return False, f"Error deleting rows in Table ({table_name})\n{e}"
         finally:
             if cursor is not None:
@@ -166,8 +261,11 @@ class MySQLDB:
     def close(self):
         try:
             db = self.get_connection()
+            if db is None:
+                return False, "Error getting connection"
             db.close()
             return True, "Connection closed successfully"
+
         except Exception as e:
             return False, f"Error closing connection\n{e}"
 

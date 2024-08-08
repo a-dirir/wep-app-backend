@@ -154,11 +154,12 @@ def application():
     # return a flask response object to the client
     if status_code == 200:
         logger.info(f"Success: {msg}")
-        return jsonify(msg=msg), status_code
     else:
         logger.error(f"Error: {msg}")
-        return jsonify(msg={'error': msg}), status_code
+
+    return jsonify(msg=msg), status_code
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=80)
+

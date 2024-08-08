@@ -17,66 +17,19 @@ class CRUD(BaseController):
 
         self.index_keys = {}
         self.foreign_keys = {}
-        self.client_side_columns = {}
+        self.columns_permissions = {}
 
         self.load_table_metadata()
 
     def load_table_metadata(self):
         for table_name in self.schema.keys():
-            self.index_keys[table_name] = self.get_index_keys(table_name)
-            self.foreign_keys[table_name] = self.get_foreign_keys(table_name)
-            self.client_side_columns[table_name] = self.get_client_side_columns(table_name)
-
-    @staticmethod
-    def get_index_keys(table_name: str):
-        index_keys = []
-        for column_name, column in schema[table_name]['columns'].items():
-            if column.get('index', False):
-                index_keys.append(column_name)
-
-        return index_keys
-
-    @staticmethod
-    def get_foreign_keys(table_name: str):
-        foreign_keys = {}
-        for column_name, column in schema[table_name]['columns'].items():
-            if column.get('foreign_key', False):
-                if column['foreign_key'].find('|') != -1:
-                    source, destination = column['foreign_key'].split('|')
-                    source_table_name, source_column_name = source.split('.')
-                    destination_table_name, destination_column_name = destination.split('.')
-                else:
-                    source_table_name, source_column_name = column['foreign_key'].split('.')
-                    destination_table_name, destination_column_name = source_table_name, source_column_name
-
-                foreign_keys[column_name] = {
-                    'table_name': source_table_name,
-                    'source_column_name': source_column_name,
-                    'destination_column_name': destination_column_name
-                }
-
-        return foreign_keys
-
-    @staticmethod
-    def get_client_side_columns(table_name: str):
-        get_client_side_columns = []
-
-        for column_name, column in schema[table_name]['columns'].items():
-            if not column.get('server_only', False):
-                get_client_side_columns.append(column_name)
-
-        return get_client_side_columns
-
-    def remove_extra_columns(self, table_name: str, row: dict):
-        new_row = {}
-        for key in row.keys():
-            if key in self.schema[table_name]['columns']:
-                new_row[key] = row[key]
-        return new_row
+            self.index_keys[table_name] = self.schema_controller.get_index_keys(table_name)
+            self.foreign_keys[table_name] = self.schema_controller.get_foreign_keys(table_name)
+            self.columns_permissions[table_name] = self.schema_controller.get_columns_permissions(table_name)
 
     def validate_data(self, table_name: str, row: dict):
         for column_name, column in self.schema[table_name]['columns'].items():
-            if column.get('not_null', False) and row.get(column_name) is None and not column.get('server_only', False):
+            if column.get('not_null', False) and row.get(column_name) is None:
                 return False, f'{column_name} is missing'
 
         return True, row
@@ -85,15 +38,16 @@ class CRUD(BaseController):
         db = payload['db']
 
         table_name = controller_db_mappings[payload['service']][payload['controller']]
+        view_columns = self.columns_permissions[table_name]['view']
 
-        success, results = db.get_rows(table_name=table_name, columns=self.client_side_columns[table_name])
+        success, results = db.get_rows(table_name=table_name, columns=view_columns)
         if not success:
-            return {'error': results}, 400
-        self.logger.info(f"Success: list rows in {table_name}")
+            return {'error': f"Error in listing {payload['controller']}"}, 400
+        self.logger.info(f"Success: list {table_name}")
 
         # get foreign keys data
-        success, results = self.schema_controller.replace_source_with_destination(self.foreign_keys[table_name],
-                                                                                  results, db)
+        success, results = self.schema_controller.add_foreign_keys_aliases(self.foreign_keys[table_name],
+                                                                           results, db)
         if not success:
             return {'error': results}, 400
         self.logger.info(f"Success: replace source with destination in {table_name}")
@@ -106,16 +60,11 @@ class CRUD(BaseController):
 
         table_name = controller_db_mappings[payload['service']][payload['controller']]
 
-        data = self.remove_extra_columns(table_name, data)
-        print(11, data)
-        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys[table_name], data, db)
-        if not success:
-            return {'error': data}, 400
-        self.logger.info(f"Success: replace destination with source in {table_name} for create")
+        data = self.schema_controller.remove_extra_columns(data, self.columns_permissions[table_name]['create'])
+        if data is None or len(data) == 0:
+            return {'error': 'No data to insert'}, 400
 
         data = self.on_create(data, db)
-
-        print(12, data)
 
         # validate data
         success, data = self.validate_data(table_name, data)
@@ -128,13 +77,32 @@ class CRUD(BaseController):
             return {'error': results}, 400
         self.logger.info(f"Success: insert row in {table_name}")
 
-        created_data = {col: data[col] for col in self.get_client_side_columns(table_name)}
-
-        # get foreign keys data
-        success, results = self.schema_controller.replace_source_with_destination(self.foreign_keys[table_name],
-                                                                                  [created_data], db)
+        results = [{col: data[col] for col in self.columns_permissions[table_name]['view']}]
 
         return {'data': results}, 200
+
+    def prepare_update_data(self, table_name: str, data: dict):
+        if data.get('new') is None or data.get('old') is None:
+            return False, 'new and old data are required'
+
+        data['new'] = self.schema_controller.remove_extra_columns(data['new'],
+                                                                  self.columns_permissions[table_name]['view'])
+        data['old'] = self.schema_controller.remove_extra_columns(data['old'],
+                                                                  self.columns_permissions[table_name]['view'])
+
+        if data['new'] is None or len(data['new']) == 0:
+            return False, 'No new data to update'
+
+        if data['old'] is None or len(data['old']) == 0:
+            return False, 'No old data to update'
+
+        for key in self.index_keys[table_name]:
+            if data['old'].get(key) is None:
+                return False, f'{key} is missing in old data'
+
+        conditions = {key: data['old'][key] for key in self.index_keys[table_name]}
+
+        return True, {'conditions': conditions, 'data': data['new']}
 
     def update(self, payload: dict):
         data = payload['data']
@@ -142,21 +110,12 @@ class CRUD(BaseController):
 
         table_name = controller_db_mappings[payload['service']][payload['controller']]
 
-        data['new'] = self.remove_extra_columns(table_name, data['new'])
-        data['old'] = self.remove_extra_columns(table_name, data['old'])
-
-        for key in self.index_keys[table_name]:
-            if data['old'].get(key) is None:
-                return {'error': f'{key} is missing'}, 400
-
-        conditions = {key: data['old'][key] for key in self.index_keys[table_name]}
-
-        data = data['new']
-
-        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys[table_name], data, db)
+        success, result = self.prepare_update_data(table_name, data)
         if not success:
-            return {'error': data}, 400
-        self.logger.info(f"Success: replace destination with source in {table_name} for update")
+            return {'error': result}, 400
+
+        conditions = result['conditions']
+        data = result['data']
 
         data = self.on_update(data, db)
 
@@ -169,19 +128,19 @@ class CRUD(BaseController):
         success, results = db.update_row(table_name=table_name, row=data, where_items=[conditions])
         if not success:
             return {'error': results}, 400
+
         self.logger.info(f"Success: update row in {table_name}")
 
-        updated_data = {col: data[col] for col in self.get_client_side_columns(table_name)}
-
-        # get foreign keys data
-        success, results = self.schema_controller.replace_source_with_destination(self.foreign_keys[table_name],
-                                                                                  [updated_data], db)
+        results = [{col: data[col] for col in self.columns_permissions[table_name]['view']}]
 
         return {'data': results}, 200
 
     def delete(self, payload: dict):
         data = payload['data']
         db = payload['db']
+
+        if data is None or len(data) == 0:
+            return {'error': 'No data to delete'}, 400
 
         table_name = controller_db_mappings[payload['service']][payload['controller']]
 
@@ -194,6 +153,7 @@ class CRUD(BaseController):
         success, results = db.delete_row(table_name=table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
+
         self.logger.info(f"Success: delete row in {table_name}")
 
         return results, 200
@@ -208,12 +168,10 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
+        if data is None or len(data) == 0:
+            return {'error': 'No data to show Linked Services for..'}, 400
 
-        success, data = self.schema_controller.replace_destination_with_source(self.foreign_keys[table_name], data, db)
-        if not success:
-            return {'error': data}, 400
-        self.logger.info(f"Success: replace destination with source in {table_name} for showLinkedServices")
+        table_name = controller_db_mappings[payload['service']][payload['controller']]
 
         for key in self.index_keys[table_name]:
             if data.get(key) is None:
@@ -230,9 +188,10 @@ class CRUD(BaseController):
 
         # get linked records
         success, results = self.schema_controller.get_linked_records(table_name, updated_data, self.foreign_keys,
-                                                                     self.client_side_columns, db)
+                                                                     self.columns_permissions, db)
         if not success:
             return {'error': results}, 400
+
         self.logger.info(f"Success: get linked records in {table_name}")
 
         return results, 200
