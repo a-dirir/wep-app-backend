@@ -50,13 +50,13 @@ schema = OrderedDict({
             },
             "salt": {
                 "type": "VARCHAR(256)",
-                "not_null": True,
+                "not_null": False,
                 "server_only": {'create': True, 'edit': True, 'view': True},
                 "label": "Salt"
             },
             "password_hashed": {
                 "type": "VARCHAR(256)",
-                "not_null": True,
+                "not_null": False,
                 "server_only": {'create': True, 'edit': True, 'view': True},
                 "label": "Hashed Password"
             }
@@ -391,6 +391,13 @@ schema = OrderedDict({
                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
                 "not_null": True,
                 "label": "Sub-Client ID"
+            },
+            "Sub_Client_Status": {
+                "type": "VARCHAR(80)",
+                "not_null": True,
+                "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Status",
+                "label": "Sub-Client Status",
+                "server_only": {'create': True, 'edit': False, 'view': False},
             },
             "Status": {
                 "type": "VARCHAR(80)",

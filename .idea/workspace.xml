@@ -6,12 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/mysql_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/mysql_db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/schema_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema_controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/success.log" beforeDir="false" afterPath="$PROJECT_DIR$/success.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
