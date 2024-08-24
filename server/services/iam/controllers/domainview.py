@@ -30,7 +30,7 @@ class DomainView(BaseController):
         domain_details = self.domains.get(domain_name)
 
         # get the rows from the database
-        success, results = db.get_rows(table_name=domain_details['table_name'], columns=domain_details['columns'])
+        success, results = db.get(table_name=domain_details['table_name'], columns=domain_details['columns'])
 
         if not success:
             return {'error': 'Failed to get the domain details'}, 400

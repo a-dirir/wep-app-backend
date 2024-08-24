@@ -1,8 +1,8 @@
-from server.common.crud import CRUD
+from server.common.crud_new import CRUDNew
 from server.util import get_logger
 
 
-class Client(CRUD):
+class Client(CRUDNew):
     def __init__(self):
         self.name = 'Client'
         super().__init__(self.name)

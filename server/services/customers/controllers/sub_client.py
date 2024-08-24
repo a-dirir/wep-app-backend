@@ -1,9 +1,10 @@
 from datetime import datetime
 from server.common.crud import CRUD
+from server.common.crud_new import CRUDNew
 from server.util import get_logger
 
 
-class SubClient(CRUD):
+class SubClient(CRUDNew):
     def __init__(self):
         self.name = 'SubClient'
         super().__init__(self.name)

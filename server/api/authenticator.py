@@ -13,7 +13,7 @@ class Authenticator:
         self.set_customers()
 
     def set_customers(self):
-        success, results = self.db.get_rows(table_name='sub_clients', columns=['Sub_Client_ID', 'Name'])
+        success, results = self.db.get(table_name='sub_clients', columns=['Sub_Client_ID', 'Name'])
         if not success:
             self.customers = []
         else:
@@ -28,7 +28,7 @@ class Authenticator:
 
         conditions = {'email': username}
 
-        success, results = self.db.get_rows(table_name=self.table_name, where_items=[conditions])
+        success, results = self.db.get(table_name=self.table_name, where_items=[conditions])
         if not success or len(results) == 0:
             return False
 

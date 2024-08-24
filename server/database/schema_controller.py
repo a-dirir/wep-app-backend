@@ -1,3 +1,12 @@
+# foreign_keys_config format: {
+#     foreign_column: {
+#         table_name: table_name,
+#         source_column_name: source_column_name,
+#         destination_column_name: destination_column_name
+#     }
+# }
+
+
 from server.database.schema import schema
 
 
@@ -58,6 +67,30 @@ class SchemaController:
                 new_row[key] = row[key]
         return new_row
 
+    def get_foreign_keys_aliases(self, foreign_keys_config: dict, db):
+        foreign_keys_aliases = {}
+
+        for foreign_column, config in foreign_keys_config.items():
+            table_name = config['table_name']
+            if config['source_column_name'] != config['destination_column_name']:
+                columns_returned = [config['source_column_name'], config['destination_column_name']]
+            else:
+                columns_returned = [config['source_column_name']]
+
+            success, rows = db.get(table_name=table_name, columns=columns_returned,
+                                   distinct="DISTINCT")
+            if not success:
+                return False, rows
+
+            foreign_keys_aliases[foreign_column] = {
+                'source_column': config['source_column_name'],
+                'destination_column': config['destination_column_name'],
+                'mappings': rows,
+            }
+
+        return True, foreign_keys_aliases
+
+
     def add_foreign_keys_aliases(self, foreign_keys: dict, records: list, db, mode="replace"):
         options = {}
         linked_columns = {}
@@ -71,14 +104,13 @@ class SchemaController:
                 foreign_columns_names = [origins['source_column_name']]
                 linked_columns[origins['source_column_name']] = f"{origins['source_column_name']}"
 
-            success, results = db.get_rows(table_name=table_name, columns=foreign_columns_names,
-                                           distinct="DISTINCT", return_type="list")
+            success, results = db.get(table_name=table_name, columns=foreign_columns_names,
+                                      distinct="DISTINCT", return_type="list")
             if not success:
                 return False, results
 
             options[foreign_column] = self.populate_options(results, foreign_columns_names)
 
-        print(options, linked_columns)
         merged_records = self.merge_columns(options, linked_columns, records)
 
         return True, {'options': options, 'linked_columns': linked_columns, 'data': merged_records}
@@ -135,8 +167,8 @@ class SchemaController:
                 # get corresponding value from source column in the database
                 conditions = {origins['destination_column_name']: record[foreign_column]}
                 foreign_columns_names = [origins['source_column_name'], origins['destination_column_name']]
-                success, results = db.get_rows(table_name=origins['table_name'], columns=foreign_columns_names,
-                                               where_items=[conditions])
+                success, results = db.get(table_name=origins['table_name'], columns=foreign_columns_names,
+                                          where_items=[conditions])
 
                 if not success:
                     return False, "Error while replacing piped foreign columns"
@@ -211,7 +243,7 @@ class SchemaController:
                 for row in rows[parent_table]:
                     where_items.append({mutual_column: row[mutual_column]})
 
-                success, results = db.get_rows(child_table, where_items=where_items)
+                success, results = db.get(child_table, where_items=where_items)
 
                 if success and len(results) > 0:
                     rows[f"{child_table}"] = results
@@ -225,7 +257,7 @@ class SchemaController:
         for table_name in rows.keys():
             if len(foreign_keys[table_name]) != 0:
                 success, results = self.add_foreign_keys_aliases(foreign_keys[table_name],
-                                                                 rows[table_name], db, 'replace')
+                                                                 rows[table_name], db, 'add')
                 if success:
                     rows[table_name] = results['data']
 

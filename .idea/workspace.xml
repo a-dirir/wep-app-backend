@@ -5,8 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/server/common/crud_new.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/database/schema_controller_new.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/authenticator.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authenticator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/jira_connector/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/jira_connector/incident.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/incident.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/loader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/database/mysql_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/mysql_db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/database/schema_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/domainview.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/domainview.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/triggered.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/success.log" beforeDir="false" afterPath="$PROJECT_DIR$/success.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,23 +58,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/services/crud",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/common&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.copilot.settings.ApplicationConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\common" />
+      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\database" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\crud" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\iam\controllers" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\Monitoring" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\customers\controllers" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\connectors" />

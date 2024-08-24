@@ -1,4 +1,5 @@
 from server.common.crud import CRUD
+from server.common.crud_new import CRUDNew
 from server.common.service import BaseService
 from server.services.customers.controllers.client import Client
 from server.services.customers.controllers.opportunity import Opportunity
@@ -14,6 +15,6 @@ class Customers(BaseService):
             'Client': Client(),
             'SubClient': SubClient(),
             'Opportunity': Opportunity(),
-            '*': CRUD(self.name)
+            '*': CRUDNew(self.name)
         }
         self.allowed_controllers = list(controller_db_mappings[self.name].keys())

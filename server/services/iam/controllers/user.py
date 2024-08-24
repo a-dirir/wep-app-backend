@@ -29,8 +29,8 @@ class User(CRUD):
             return {'error': 'User email is required to generate credentials'}, 400
 
         #  update the user with the new credentials
-        success, results = db.update_row(table_name,
-                                         {'salt': salt, 'password_hashed': password_hashed}, [{'email': email}])
+        success, results = db.update(table_name,
+                                     {'salt': salt, 'password_hashed': password_hashed}, [{'email': email}])
         if not success:
             self.logger.error(f"Failed to update user {email} with new credentials")
             return {'error': results}, 400

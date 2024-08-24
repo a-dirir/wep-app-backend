@@ -18,13 +18,13 @@ class MySQLDB:
                 user=environ.get("MYSQL_USER"),
                 password=environ.get("MYSQL_PASSWORD"),
                 database=environ.get("MYSQL_DATABASE_NAME"),
-                ssl_ca='crm-ca.pem'
+                ssl_ca='ca.pem'
             )
         except mysql.connector.Error as err:
             self.logger.error(f"Error initializing connection pool: {err}")
             self.pool = None
 
-    def get_connection(self, retries=3, delay=3):
+    def _get_connection(self, retries=3, delay=3):
         if not self.pool:
             self.logger.error("Connection pool is not initialized")
             return None
@@ -43,7 +43,7 @@ class MySQLDB:
         return None
 
     @staticmethod
-    def generate_where_clause(where_items: list):
+    def _generate_where_clause(where_items: list):
         # where_items is list of dictionaries, where each dictionary is a condition,
         # use AND to join them, and OR to join list items
 
@@ -68,7 +68,7 @@ class MySQLDB:
         return where_clause
 
     @staticmethod
-    def convert_results_to_dict(rows: list, columns: list = None):
+    def _convert_results_to_dict(rows: list, columns: list = None):
         result = []
         for row in rows:
             row_dict = {}
@@ -77,14 +77,14 @@ class MySQLDB:
             result.append(row_dict)
         return result
 
-    def get_rows(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = "",
-                 return_type: str = "dict"):
+    def get(self, table_name: str, columns: list = None, where_items: list = None, distinct: str = "",
+            return_type: str = "dict"):
         cursor = None
         db = None
         sql = ""
 
         try:
-            db = self.get_connection()
+            db = self._get_connection()
             if db is None:
                 return False, "Error getting connection"
 
@@ -96,7 +96,7 @@ class MySQLDB:
             sql = f"SELECT {distinct} {columns_str} FROM {table_name}"
 
             if where_items is not None:
-                where_clause = self.generate_where_clause(where_items)
+                where_clause = self._generate_where_clause(where_items)
                 sql = f"{sql} WHERE {where_clause}"
 
             cursor = db.cursor()
@@ -104,7 +104,7 @@ class MySQLDB:
             results = cursor.fetchall()
 
             if return_type == "dict":
-                results = self.convert_results_to_dict(results, columns)
+                results = self._convert_results_to_dict(results, columns)
 
             return True, results
 
@@ -117,62 +117,13 @@ class MySQLDB:
             if db is not None:
                 db.close()
 
-    def get_joined_rows(self, base_table: str, join_table: str, join_condition: str,
-                        base_columns: list = None, join_columns: list = None,
-                        where_items: list = None, distinct: str = "",
-                        return_type: str = "dict"):
+    def insert(self, table_name: str, row: dict):
         cursor = None
         db = None
         sql = ""
 
         try:
-            db = self.get_connection()
-            if db is None:
-                return False, "Error getting connection"
-
-            if base_columns is None:
-                base_columns = list(schema[base_table]['columns'].keys())
-
-            if join_columns is None:
-                join_columns = list(schema[join_table]['columns'].keys())
-
-            base_columns_str = ", ".join([f"{base_table}.{col}" for col in base_columns])
-            join_columns_str = ", ".join([f"{join_table}.{col}" for col in join_columns])
-
-            columns_str = ", ".join([base_columns_str, join_columns_str])
-
-            sql = f"SELECT {distinct} {columns_str} FROM {base_table} JOIN {join_table} ON {join_condition}"
-
-            if where_items is not None:
-                where_clause = self.generate_where_clause(where_items)
-                sql = f"{sql} WHERE {where_clause}"
-
-            cursor = db.cursor()
-            cursor.execute(sql)
-            results = cursor.fetchall()
-
-            if return_type == "dict":
-                columns = base_columns + join_columns
-                results = self.convert_results_to_dict(results, columns)
-
-            return True, results
-
-        except Exception as e:
-            return False, str(e)
-
-        finally:
-            if cursor:
-                cursor.close()
-            if db:
-                db.close()
-
-    def insert_row(self, table_name: str, row: dict):
-        cursor = None
-        db = None
-        sql = ""
-
-        try:
-            db = self.get_connection()
+            db = self._get_connection()
             if db is None:
                 return False, "Error getting connection"
 
@@ -195,13 +146,13 @@ class MySQLDB:
             if db is not None:
                 db.close()
 
-    def update_row(self, table_name: str, row: dict, where_items: list):
+    def update(self, table_name: str, row: dict, where_items: list):
         cursor = None
         db = None
         sql = ""
 
         try:
-            db = self.get_connection()
+            db = self._get_connection()
             if db is None:
                 return False, "Error getting connection"
 
@@ -212,7 +163,7 @@ class MySQLDB:
                 set_clause = f"{set_clause}{key} = {value}, "
             set_clause = set_clause[:-2]
 
-            where_clause = self.generate_where_clause(where_items)
+            where_clause = self._generate_where_clause(where_items)
 
             sql = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause};"
 
@@ -230,17 +181,17 @@ class MySQLDB:
             if db is not None:
                 db.close()
 
-    def delete_row(self, table_name: str, where_items: list):
+    def delete(self, table_name: str, where_items: list):
         cursor = None
         db = None
         sql = ""
 
         try:
-            db = self.get_connection()
+            db = self._get_connection()
             if db is None:
                 return False, "Error getting connection"
 
-            where_clause = self.generate_where_clause(where_items)
+            where_clause = self._generate_where_clause(where_items)
 
             sql = f"DELETE FROM {table_name} WHERE {where_clause}"
 
@@ -258,9 +209,36 @@ class MySQLDB:
             if db is not None:
                 db.close()
 
+    def execute(self, table_name: str, sql: str, return_results: bool = False):
+        cursor = None
+        db = None
+
+        try:
+            db = self._get_connection()
+            if db is None:
+                return False, "Error getting connection"
+
+            cursor = db.cursor()
+            cursor.execute(sql)
+
+            if return_results:
+                results = cursor.fetchall()
+                return True, results
+
+            db.commit()
+            return True, f"Query executed successfully"
+        except Exception as e:
+            self.logger.error(f"Error executing following query into Table ({table_name}) {sql} ::: {e}")
+            return False, f"Error executing query into database"
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if db is not None:
+                db.close()
+
     def close(self):
         try:
-            db = self.get_connection()
+            db = self._get_connection()
             if db is None:
                 return False, "Error getting connection"
             db.close()

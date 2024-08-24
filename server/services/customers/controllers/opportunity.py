@@ -25,7 +25,7 @@ class Opportunity(CRUD):
 
         conditions = {'Sub_Client_ID': data['Sub_Client_ID']}
 
-        success, results = db.get_rows(table_name=self.table_name, where_items=[conditions])
+        success, results = db.get(table_name=self.table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 

@@ -19,6 +19,8 @@ class CRUD(BaseController):
         self.foreign_keys = {}
         self.columns_permissions = {}
 
+        self.controller_db_mappings = controller_db_mappings
+
         self.load_table_metadata()
 
     def load_table_metadata(self):
@@ -37,28 +39,25 @@ class CRUD(BaseController):
     def list(self, payload: dict):
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
-        view_columns = self.columns_permissions[table_name]['view']
+        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
 
-        success, results = db.get_rows(table_name=table_name, columns=view_columns)
+        success, rows = db.get(table_name=table_name)
         if not success:
             return {'error': f"Error in listing {payload['controller']}"}, 400
-        self.logger.info(f"Success: list {table_name}")
+        self.logger.info(f"Success: get rows of {table_name}")
 
-        # get foreign keys data
-        success, results = self.schema_controller.add_foreign_keys_aliases(self.foreign_keys[table_name],
-                                                                           results, db)
+        success, foreign_keys_aliases = self.schema_controller.get_foreign_keys_aliases(self.foreign_keys[table_name], db)
         if not success:
-            return {'error': results}, 400
-        self.logger.info(f"Success: replace source with destination in {table_name}")
+            return {'error': f"Error in listing {payload['controller']}"}, 400
+        self.logger.info(f"Success: get foreign keys aliases for {table_name}")
 
-        return results, 200
+        return {'data': rows, 'columns_aliases': foreign_keys_aliases}, 200
 
     def create(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
+        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
 
         data = self.schema_controller.remove_extra_columns(data, self.columns_permissions[table_name]['create'])
         if data is None or len(data) == 0:
@@ -72,7 +71,7 @@ class CRUD(BaseController):
             return {'error': data}, 400
 
         # insert row into table
-        success, results = db.insert_row(table_name=table_name, row=data)
+        success, results = db.insert(table_name=table_name, row=data)
         if not success:
             return {'error': results}, 400
         self.logger.info(f"Success: insert row in {table_name}")
@@ -108,7 +107,7 @@ class CRUD(BaseController):
         data = payload['data']
         db = payload['db']
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
+        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
 
         success, result = self.prepare_update_data(table_name, data)
         if not success:
@@ -125,7 +124,7 @@ class CRUD(BaseController):
             return {'error': data}, 400
 
         # update row in table
-        success, results = db.update_row(table_name=table_name, row=data, where_items=[conditions])
+        success, results = db.update(table_name=table_name, row=data, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 
@@ -142,7 +141,7 @@ class CRUD(BaseController):
         if data is None or len(data) == 0:
             return {'error': 'No data to delete'}, 400
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
+        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
 
         for key in self.index_keys[table_name]:
             if data.get(key) is None:
@@ -150,7 +149,7 @@ class CRUD(BaseController):
 
         conditions = {key: data[key] for key in self.index_keys[table_name]}
 
-        success, results = db.delete_row(table_name=table_name, where_items=[conditions])
+        success, results = db.delete(table_name=table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 
@@ -171,7 +170,7 @@ class CRUD(BaseController):
         if data is None or len(data) == 0:
             return {'error': 'No data to show Linked Services for..'}, 400
 
-        table_name = controller_db_mappings[payload['service']][payload['controller']]
+        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
 
         for key in self.index_keys[table_name]:
             if data.get(key) is None:
@@ -180,7 +179,7 @@ class CRUD(BaseController):
         conditions = {key: data[key] for key in self.index_keys[table_name]}
 
         # get full row
-        success, results = db.get_rows(table_name=table_name, where_items=[conditions])
+        success, results = db.get(table_name=table_name, where_items=[conditions])
         if not success:
             return {'error': results}, 400
 

@@ -134,28 +134,66 @@ def logout():
 @app.route('/app', methods=['POST'])
 @login_required
 def application():
-    if not current_user.is_authenticated:
-        return jsonify(msg='User is not authenticated'), 401
+    try:
+        if not current_user.is_authenticated:
+            return jsonify(msg='User is not authenticated'), 401
 
-    # load json data from request
-    payload = request.get_json()
-    payload['db'] = db
-    payload['router'] = router
+        # load json data from request
+        payload = request.get_json()
+        payload['db'] = db
+        payload['router'] = router
 
-    user_group = authenticator.get_user_group(current_user.username)
-    if user_group is None:
-        return jsonify(msg={'error': 'User is not authenticated'}), 401
+        user_group = authenticator.get_user_group(current_user.username)
+        if user_group is None:
+            return jsonify(msg={'error': 'User is not authenticated'}), 401
 
-    payload['user'] = {'username': current_user.username, 'group': user_group}
+        payload['user'] = {'username': current_user.username, 'group': user_group}
 
-    # route the request to the appropriate service, controller and method
-    msg, status_code = router.route(payload)
+        # route the request to the appropriate service, controller and method
+        msg, status_code = router.route(payload)
 
-    # return a flask response object to the client
-    if status_code == 200:
-        logger.info(f"Success: {msg}")
-    else:
-        logger.error(f"Error: {msg}")
+        # return a flask response object to the client
+        if status_code == 200:
+            logger.info(f"Success: {msg}")
+            return jsonify(msg=msg), status_code
+        else:
+            logger.error(f"Error: {msg}")
+            return jsonify(msg), status_code
+
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        msg = {'error': 'The server encountered an internal error and was unable to complete your request'}
+        status_code = 500
+
+    return jsonify(msg=msg), status_code
+
+
+@app.route('/test', methods=['POST'])
+def test():
+    try:
+        # load json data from request
+        payload = request.get_json()
+        payload['db'] = db
+        payload['router'] = router
+
+        payload['user'] = {'username': 'ahmed.dirir@bespinglobal.ae', 'group': 'admin'}
+
+        # route the request to the appropriate service, controller and method
+        msg, status_code = router.route(payload)
+
+        # return a flask response object to the client
+        if status_code == 200:
+            logger.info(f"Success: {msg}")
+            return jsonify(msg=msg), status_code
+        else:
+            logger.error(f"Error: {msg}")
+            return jsonify(msg), status_code
+
+    except Exception as e:
+        print(e)
+        logger.error(f"Error: {e}")
+        msg = {'error': 'The server encountered an internal error and was unable to complete your request'}
+        status_code = 500
 
     return jsonify(msg=msg), status_code
 
