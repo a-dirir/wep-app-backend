@@ -1,4 +1,4 @@
-# Internal Portal Web Application
+# Internal Portal Web Application Backend
 
 ## Introduction
 The Internal Portal Web Application serves as a centralized platform designed to streamline various business operations within the organization. 

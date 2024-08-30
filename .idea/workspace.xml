@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/README1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,17 +47,17 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/Ahmed Mukhtar/Desktop/wep app/wep-app-backend/server/services",
+    "last_opened_file_path": "C:/Users/Ahmed Mukhtar/Desktop/wep app/wep-app-backend",
     "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend" />
       <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services" />
       <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services\global\controllers" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\common" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\database" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\crud" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend" />
