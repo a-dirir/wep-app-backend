@@ -1,14 +1,20 @@
 from server.api.authorizer import Authorizer
-from server.services.customers.service import Customers
-from server.services.iam.service import IAM
+from server.services.common.common_service import CommonService
+from server.services.departments.departments_service import DepartmentsService
+from server.services.employees.employees_service import EmployeesService
+from server.services.iam.iam_service import IAMService
+from server.services.tasks.tasks_service import TasksService
 from server.util import get_logger
 
 
 class Router:
     def __init__(self):
         self.services = {
-            'IAM': IAM(),
-            'Customers': Customers(),
+            'IAM': IAMService(),
+            'Employees': EmployeesService(),
+            'Departments': DepartmentsService(),
+            'Tasks': TasksService(),
+            'Common': CommonService()
         }
         self.authorizer = Authorizer()
 

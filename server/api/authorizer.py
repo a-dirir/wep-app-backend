@@ -18,7 +18,7 @@ class Authorizer:
         if len(self.cache[group]) > 100:
             self.cache[group] = {}
 
-        _id = f"{access['action']}:{access['customer']}:{access['resource']}"
+        _id = f"{access['action']}:{access['resource']}"
         if self.cache[group].get(_id) is None:
             self.cache[group][_id] = self.check_policy(group, access)
 
@@ -26,10 +26,9 @@ class Authorizer:
 
     def check_policy(self, group: str, access: dict):
         action = access.get('action')
-        customer = access.get('customer')
         resource = access.get('resource')
 
-        if action is None or customer is None or resource is None:
+        if action is None or resource is None:
             return False
 
         if self.policies.get(group) is None:
@@ -37,17 +36,17 @@ class Authorizer:
 
         # check for * wildcard
         if '*' in self.policies[group]['permissions']:
-            if self.check_action(group, '*', customer, resource):
+            if self.check_action(group, '*', resource):
                 return True
 
         # check for specific action
         if self.policies[group]['permissions'].get(action) is not None:
-            if self.check_action(group, action, customer, resource):
+            if self.check_action(group, action, resource):
                 return True
 
         return False
 
-    def check_action(self, group: str, action: str, customer: str, resource: str):
+    def check_action(self, group: str, action: str, resource: str):
         permission = self.policies[group]['permissions'].get(action)
         if permission is None:
             return False
@@ -55,16 +54,14 @@ class Authorizer:
         # check for deny effect
         if permission.get('deny') is not None:
             # check for * wildcard
-            if '*' in permission['deny']['customers'] or customer in permission['deny']['customers']:
-                if resource in permission['deny']['resources'] or '*' in permission['deny']['resources']:
-                    return False
+            if resource in permission['deny']['resources'] or '*' in permission['deny']['resources']:
+                return False
 
         # check for allow effect
         if permission.get('allow') is not None:
             # check for * wildcard
-            if '*' in permission['allow']['customers'] or customer in permission['allow']['customers']:
-                if resource in permission['allow']['resources'] or '*' in permission['allow']['resources']:
-                    return True
+            if resource in permission['allow']['resources'] or '*' in permission['allow']['resources']:
+                return True
 
         return False
 
@@ -79,33 +76,23 @@ class Authorizer:
                 if permissions.get(action) is None:
                     permissions[action] = {
                         statement['effect']: {
-                            'customers': statement['customers'],
                             'resources': statement['resources']
                         }
                     }
 
                 elif permissions[action].get(statement['effect']) is None:
                     permissions[action][statement['effect']] = {
-                            'customers': statement['customers'],
-                            'resources': statement['resources']
+                        'resources': statement['resources']
                     }
 
                 else:
-                    current_customers = permissions[action][statement['effect']]['customers']
                     current_resources = permissions[action][statement['effect']]['resources']
-
-                    # add new customers to the current customers
-                    for customer in statement['customers']:
-                        if customer not in current_customers:
-                            current_customers.append(customer)
-
                     # add new resources to the current resources
                     for resource in statement['resources']:
                         if resource not in current_resources:
                             current_resources.append(resource)
 
                     permissions[action][statement['effect']] = {
-                        'customers': current_customers,
                         'resources': current_resources
                     }
 

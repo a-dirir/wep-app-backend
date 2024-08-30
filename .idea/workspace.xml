@@ -5,35 +5,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="091dbae1-ea3a-4f3b-ab6f-48ce3084678c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/common/crud_new.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/database/schema_controller_new.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/base/mappings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/common/common_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/common/controllers/records_linker.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/departments/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/departments/controllers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/departments/departments_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/employees/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/employees/controllers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/employees/controllers/leave_history_controller.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/tasks/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/tasks/controllers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/services/tasks/tasks_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/api/authenticator.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authenticator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/authorizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/authorizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/api/policies.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/policies.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/api/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/api/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/common/crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/jira_connector/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/jira_connector/incident.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/agent.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/incident.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/connectors/newrelic/loader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/base/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/base/controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/base/crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/crud_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/base/crud_new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/mappings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/common/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/base/service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/database/mysql_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/mysql_db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/database/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/database/schema_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema_controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/customers/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/domainview.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/domainview.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/controllers/alarm/triggered.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/services/infrastructure/service.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/success.log" beforeDir="false" afterPath="$PROJECT_DIR$/success.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/database/schema_controller_new.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/database/schema_controller_new.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/common/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/common/controllers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/opportunity.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/controllers/sub_client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/customers/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/employees/employees_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/domainview.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/controllers/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/controllers/user_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/services/iam/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/services/iam/iam_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,6 +62,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
   <component name="ProjectId" id="2cunzydu8ixG9uoYSzAJnlXeCwe" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -58,35 +73,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/AhmedDirir/OneDrive - Bespin Global MEA/Desktop/crm/crm-back-end/server/common&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.copilot.settings.ApplicationConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.main (1).executor": "Run",
+    "Python.main.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/Ahmed Mukhtar/Desktop/wep app/wep-app-backend/server/services",
+    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services" />
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services\global\controllers" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\common" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\database" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\crud" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\iam\controllers" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\base" />
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services\crud\controllers" />
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\services\crud" />
+      <recent name="C:\Users\Ahmed Mukhtar\Desktop\wep app\wep-app-backend\server\database" />
       <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\connectors" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\common" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server\services\Monitoring\controllers" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end" />
-      <recent name="C:\Users\AhmedDirir\OneDrive - Bespin Global MEA\Desktop\crm\crm-back-end\server" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main (1)">
+  <component name="RunManager" selected="Python.main">
     <configuration name="email_service" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -108,6 +127,7 @@
     </configuration>
     <configuration name="incident" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -129,6 +149,7 @@
     </configuration>
     <configuration name="logger_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -150,6 +171,7 @@
     </configuration>
     <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -171,6 +193,7 @@
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -192,6 +215,7 @@
     </configuration>
     <configuration name="processor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="crm-back-end" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -213,13 +237,20 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.email_service" />
         <item itemvalue="Python.incident" />
         <item itemvalue="Python.logger_test" />
-        <item itemvalue="Python.processor" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-d68999036c7f-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13763.11" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

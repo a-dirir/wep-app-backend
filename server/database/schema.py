@@ -13,7 +13,6 @@ schema_template = {
             "column_name": {
                 "type": "type", # STRING(128), DATE.
                 "label": "label",
-                "allowed_values": ["value1", "value2", ...], default is None
                 "index": True, default is False, used for indexing. 
                 "required": True, default is True
                 "foreign_key": "source table_name.column_name | alias table_name.column_name", default is None
@@ -24,569 +23,323 @@ schema_template = {
 }
 """
 
-# schema_old = OrderedDict({
-#     "iam_users": {
-#         "label": "IAM Users",
-#         "columns": {
-#             "email": {
-#               "type": "STRING(128)",
-#               "index": True,
-#               "not_null": True,
-#               "label": "Email Address"
-#             },
-#             "name": {
-#               "type": "STRING(64)",
-#               "label": "Full Name"
-#             },
-#             "user_group": {
-#               "type": "STRING(64)",
-#               "not_null": True,
-#               "allowed_values": ["user", "admin"],
-#               "label": "User Group"
-#             },
-#             "salt": {
-#                 "type": "STRING(256)",
-#                 "not_null": False,
-#                 "server_only": {'create': True, 'edit': True, 'view': True},
-#                 "label": "Salt"
-#             },
-#             "password_hashed": {
-#                 "type": "STRING(256)",
-#                 "not_null": False,
-#                 "server_only": {'create': True, 'edit': True, 'view': True},
-#                 "label": "Hashed Password"
-#             }
-#         },
-#     },
-#     "clients": {
-#         "label": "Clients",
-#         "columns": {
-#             "Client_ID": {
-#                 "type": "STRING(100)",
-#                 "label": "Client ID",
-#                 "index": True,
-#                 "client_permission": {'create': False, 'edit': False, 'view': True},
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "label": "Client Name",
-#                 "index": True,
-#             },
-#         },
-#     },
-#     "sub_clients": {
-#         "label": "Sub Clients",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "label": "Sub-Client ID",
-#                 "index": True,
-#                 "client_permission": {'create': False, 'edit': False, 'view': True},
-#             },
-#             "Client_ID": {
-#                 "type": "STRING(100)",
-#                 "label": "Client ID",
-#                 "foreign_key": "clients.Client_ID|clients.Name",
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "label": "Sub-Client Name",
-#                 "index": True,
-#             },
-#             "Status": {
-#                 "type": "STRING(45)",
-#                 "label": "Status",
-#                 "allowed_values": ["Current", "Terminated"],
-#             },
-#             "First_Engagement_Date": {
-#                 "type": "DATE",
-#                 "label": "First Engagement Date"
-#             },
-#             "Engagement_Year": {
-#                 "type": "STRING(45)",
-#                 "label": "Engagement Year",
-#                 "client_permission": {'create': False, 'edit': False, 'view': True},
-#             },
-#             "Engagement_Quarter": {
-#                 "type": "STRING(45)",
-#                 "label": "Engagement Quarter",
-#                 "client_permission": {'create': False, 'edit': False, 'view': True},
-#             },
-#         }
-#     },
-#     "clients_contacts": {
-#         "label": "Client Contacts",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "Account_Manager": {
-#                 "type": "STRING(80)",
-#                 "foreign_key": "ms_account_managers.name",
-#                 "not_null": True,
-#                 "label": "Account Manager"
-#             },
-#             "MS_Focal_Point": {
-#                 "type": "STRING(80)",
-#                 "foreign_key": "ms_focal_points.name",
-#                 "not_null": True,
-#                 "label": "MS Focal Point"
-#             },
-#             "Domain": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "label": "Domain"
-#             },
-#             "Contact_Type": {
-#                 "type": "STRING(80)",
-#                 "not_null": True,
-#                 "allowed_values": ["Primary Contact", "Secondary Contact", "Escalation Contact"],
-#                 "index": True,
-#                 "label": "Contact Type"
-#             },
-#             "Position": {
-#                 "type": "STRING(80)",
-#                 "not_null": True,
-#                 "label": "Position"
-#             },
-#             "Contact_Name": {
-#                 "type": "STRING(120)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Contact Name"
-#             },
-#             "Contact_Email": {
-#                 "type": "STRING(80)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Contact Email"
-#             },
-#             "Contact_Number": {
-#                 "type": "STRING(45)",
-#                 "not_null": True,
-#                 "label": "Contact Number"
-#             },
-#         }
-#     },
-#     "ms_focal_points": {
-#         "label": "MS Focal Points",
-#         "columns": {
-#             "email": {
-#               "type": "STRING(128)",
-#               "index": True,
-#               "not_null": True,
-#               "label": "Email Address"
-#             },
-#             "name": {
-#               "type": "STRING(64)",
-#               "label": "Full Name"
-#             },
-#             "title": {
-#               "type": "STRING(64)",
-#               "label": "Title"
-#             },
-#             "phone_number": {
-#               "type": "STRING(64)",
-#               "label": "Phone Number"
-#             },
-#         },
-#     },
-#     "ms_account_managers": {
-#         "label": "MS Account Managers",
-#         "columns": {
-#             "email": {
-#               "type": "STRING(128)",
-#               "index": True,
-#               "not_null": True,
-#               "label": "Email Address"
-#             },
-#             "name": {
-#               "type": "STRING(64)",
-#               "label": "Full Name"
-#             },
-#             "title": {
-#               "type": "STRING(64)",
-#               "label": "Title"
-#             },
-#             "phone_number": {
-#               "type": "STRING(64)",
-#               "label": "Phone Number"
-#             },
-#         },
-#     },
-#     "clients_url": {
-#         "label": "Clients URL",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "URL": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "URL"
-#             },
-#             "URL_SSL_Expiry_Date": {
-#                 "type": "STRING(50)",
-#                 "not_null": True,
-#                 "label": "SSL Expiry Date"
-#             },
-#         }
-#     },
-#     "aws_accounts": {
-#         "label": "AWS Accounts",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "Account_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Account ID"
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "not_null": True,
-#                 "label": "Account Name"
-#             },
-#             "Master_Account": {
-#                 "type": "STRING(100)",
-#                 "label": "Master Account"
-#             },
-#             "region": {
-#                 "type": "STRING(50)",
-#                 "not_null": True,
-#                 "label": "Region"
-#             },
-#         }
-#     },
-#     "azure_accounts": {
-#         "label": "Azure Accounts",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "Subscription_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Subscription ID"
-#             },
-#             "Tenant_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "label": "Tenant ID"
-#             },
-#             "Name": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "label": "Account Name"
-#             }
-#         }
-#     },
-#     "m365_accounts": {
-#         "label": "M365 Accounts",
-#         "columns": {
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "Tenant_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Tenant ID"
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "not_null": True,
-#                 "label": "Account Name"
-#             }
-#         }
-#     },
-#     "products": {
-#         "label": "Products",
-#         "columns": {
-#             "Product_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Product ID"
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "not_null": True,
-#                 "label": "Product Name"
-#             },
-#             "Product_Type": {
-#                 "type": "STRING(45)",
-#                 "not_null": True,
-#                 "label": "Product Type"
-#             }
-#         }
-#     },
-#     "addons": {
-#         "label": "Addons",
-#         "columns": {
-#             "Addon_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Addon ID"
-#             },
-#             "Name": {
-#                 "type": "STRING(200)",
-#                 "not_null": True,
-#                 "label": "Addon Name"
-#             },
-#             "Addon_Type": {
-#                 "type": "STRING(45)",
-#                 "not_null": True,
-#                 "label": "Addon Type"
-#             }
-#         }
-#     },
-#     "opportunities": {
-#         "label": "Opportunities",
-#         "columns": {
-#             "Opportunity_ID_UQ": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Opportunity Unique ID"
-#             },
-#             "Opportunity_ID": {
-#                 "type": "STRING(100)",
-#                 "not_null": True,
-#                 "label": "Opportunity ID"
-#             },
-#             "Sub_Client_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "sub_clients.Sub_Client_ID|sub_clients.Name",
-#                 "not_null": True,
-#                 "label": "Sub-Client ID"
-#             },
-#             "Status": {
-#                 "type": "STRING(80)",
-#                 "not_null": True,
-#                 "label": "Status",
-#                 "server_only": {'create': True, 'edit': False, 'view': False},
-#             },
-#             "Start_Date": {
-#                 "type": "DATE",
-#                 "not_null": True,
-#                 "label": "Start Date"
-#             },
-#             "End_Date": {
-#                 "type": "DATE",
-#                 "not_null": True,
-#                 "label": "End Date"
-#             },
-#         }
-#     },
-#     "aws_opportunity_details": {
-#         "label": "AWS Opportunity Details",
-#         "columns": {
-#             "Opportunity_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "opportunities.Opportunity_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Opportunity ID"
-#             },
-#             "Account_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "aws_accounts.Account_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Account ID"
-#             },
-#             "Product_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "products.Product_ID|products.Name",
-#                 "not_null": True,
-#                 "label": "Product ID"
-#             },
-#             "Addon_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "addons.Addon_ID|addons.Name",
-#                 "not_null": True,
-#                 "label": "Addon ID"
-#             },
-#         }
-#     },
-#     "azure_opportunity_details": {
-#         "label": "Azure Opportunity Details",
-#         "columns": {
-#             "Opportunity_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "opportunities.Opportunity_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Opportunity ID"
-#             },
-#             "Subscription_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "azure_accounts.Subscription_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Subscription ID"
-#             },
-#             "Product_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "products.Product_ID|products.Name",
-#                 "not_null": True,
-#                 "label": "Product ID"
-#             },
-#             "Addon_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "addons.Addon_ID|addons.Name",
-#                 "not_null": True,
-#                 "label": "Addon ID"
-#             },
-#         }
-#     },
-#     "m365_opportunity_details": {
-#         "label": "M365 Opportunity Details",
-#         "columns": {
-#             "Opportunity_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "opportunities.Opportunity_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Opportunity ID"
-#             },
-#             "Tenant_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "m365_accounts.Tenant_ID",
-#                 "not_null": True,
-#                 "index": True,
-#                 "label": "Tenant ID"
-#             },
-#             "Product_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "products.Product_ID|products.Name",
-#                 "not_null": True,
-#                 "label": "Product ID"
-#             },
-#             "Addon_ID": {
-#                 "type": "STRING(100)",
-#                 "foreign_key": "addons.Addon_ID|addons.Name",
-#                 "not_null": True,
-#                 "label": "Addon ID"
-#             },
-#         }
-#     },
-# })
-
 schema = OrderedDict({
     "iam_users": {
         "label": "IAM Users",
         "columns": {
             "email": {
-              "type": "STRING(128)",
+              "type": "STRING(10,128)",
               "index": True,
-              "not_null": True,
               "label": "Email Address"
             },
             "name": {
-              "type": "STRING(64)",
+              "type": "STRING(10,64)",
               "label": "Full Name"
             },
             "user_group": {
-              "type": "STRING(64)",
-              "not_null": True,
-              "allowed_values": ["user", "admin"],
+              "type": "STRING(4,64)",
               "label": "User Group"
             },
             "salt": {
-                "type": "STRING(256)",
-                "not_null": False,
-                "server_only": {'create': True, 'edit': True, 'view': True},
+                "type": "STRING(0,256)",
+                "client_permission": {'create': False, 'update': False, 'view': False},
                 "label": "Salt"
             },
             "password_hashed": {
-                "type": "STRING(256)",
-                "not_null": False,
-                "server_only": {'create': True, 'edit': True, 'view': True},
+                "type": "STRING(0,256)",
+                "client_permission": {'create': False, 'update': False, 'view': False},
                 "label": "Hashed Password"
             }
         },
     },
-    "clients": {
-        "label": "Clients",
+    "employees": {
+        "label": "Employees",
         "columns": {
-            "Client_ID": {
-                "type": "STRING(0,100)",
-                "label": "Client ID",
+            "emp_no": {
+                "type": "INT",
                 "index": True,
-                "client_permission": {'create': False, 'edit': False, 'view': True},
+                "label": "Employee Number",
+                "client_permission": {'create': False, 'update': False, 'view': True}
             },
-            "Name": {
-                "type": "STRING(0,200)",
-                "label": "Client Name",
-                "index": True,
+            "birth_date": {
+                "type": "DATE",
+                "label": "Birth Date"
             },
-        },
-        'column_order': ['Client ID', 'Client Name']
+            "name": {
+                "type": "STRING(45)",
+                "label": "Employee Name"
+            },
+            "gender": {
+                "type": "ENUM('M', 'F')",
+                "label": "Employee Gender"
+            },
+            "hire_date": {
+                "type": "DATE",
+                "label": "Hire Date"
+            }
+        }
     },
-    "sub_clients": {
-        "label": "Sub Clients",
+    "departments": {
+        "label": "Departments",
         "columns": {
-            "Sub_Client_ID": {
-                "type": "STRING(0,100)",
-                "label": "Sub-Client ID",
+            "dept_no": {
+                "type": "STRING(4)",
+                "label": "Department Number",
                 "index": True,
-                "client_permission": {'create': False, 'edit': False, 'view': True},
+                "client_permission": {'create': False, 'update': False, 'view': True}
             },
-            "Client_ID": {
-                "type": "STRING(0,100)",
-                "label": "Client ID",
-                "foreign_key": "clients.Client_ID|clients.Name",
-                "foreign_key_alias": "Client Name",
-            },
-            "Name": {
-                "type": "STRING(0,200)",
-                "label": "Sub-Client Name",
+            "dept_name": {
+                "type": "STRING(40)",
+                "label": "Department Name",
+            }
+        }
+    },
+    "dept_manager": {
+        "label": "Department Managers",
+        "columns": {
+            "dept_no": {
+                "type": "CHAR(4)",
+                "label": "Department Number",
                 "index": True,
+                "foreign_key": "departments.dept_no|departments.dept_name",
+                "foreign_key_alias": "Department Name",
             },
-            "Status": {
-                "type": "STRING(0,45)",
-                "label": "Status",
-                "allowed_values": ["Current", "Terminated"],
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
             },
-            "First_Engagement_Date": {
-                "type": "DATE(DD-MM-YYYY)",
-                "label": "First Engagement Date"
+            "from_date": {
+                "type": "DATE",
+                "label": "Start Date"
             },
-            "Engagement_Year": {
-                "type": "STRING(0,45)",
-                "label": "Engagement Year",
-                "client_permission": {'create': False, 'edit': False, 'view': True},
+            "to_date": {
+                "type": "DATE",
+                "label": "End Date"
+            }
+        }
+    },
+    "dept_emp": {
+        "label": "Department Employees",
+        "columns": {
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
             },
-            "Engagement_Quarter": {
-                "type": "STRING(0,45)",
-                "label": "Engagement Quarter",
-                "client_permission": {'create': False, 'edit': False, 'view': True},
+            "dept_no": {
+                "type": "CHAR(4)",
+                "label": "Department Number",
+                "index": True,
+                "foreign_key": "departments.dept_no|departments.dept_name",
+                "foreign_key_alias": "Department Name",
             },
-        },
-        'column_order': ['Client ID', 'Client Name', 'Sub-Client ID', 'Sub-Client Name', 'Status',
-                         'First Engagement Date', 'Engagement Year', 'Engagement Quarter']
+            "from_date": {
+                "type": "DATE",
+                "label": "Start Date"
+            },
+            "to_date": {
+                "type": "DATE",
+                "label": "End Date"
+            }
+        }
+    },
+    "titles": {
+        "label": "Titles",
+        "columns": {
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "title": {
+                "type": "STRING(50)",
+                "label": "Title"
+            },
+            "from_date": {
+                "type": "DATE",
+                "label": "STart Date"
+            },
+            "to_date": {
+                "type": "DATE",
+                "label": "End Date"
+            }
+        }
+    },
+    "salaries": {
+        "label": "Salaries",
+        "columns": {
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "salary": {
+                "type": "INT",
+                "label": "Salary"
+            },
+            "from_date": {
+                "type": "DATE",
+                "label": "Start Date"
+            },
+            "to_date": {
+                "type": "DATE",
+                "label": "End Date"
+            }
+        }
+    },
+    "leave_balances": {
+        "label": "Leave Balances",
+        "columns": {
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "leave_type": {
+                "type": "ENUM('Sick Leave', 'Annual Leave')",
+                "label": "Leave Type"
+            },
+            "total_leave": {
+                "type": "INT",
+                "label": "Total Leave",
+                "client_permission": {'create': True, 'update': False, 'view': True}
+            },
+            "leave_taken": {
+                "type": "INT",
+                "label": "Leave Taken",
+                "client_permission": {'create': False, 'update': False, 'view': True}
+            },
+            "leave_remaining": {
+                "type": "INT",
+                "label": "Leave Remaining",
+                "client_permission": {'create': False, 'update': False, 'view': True}
+            }
+        }
+    },
+    "leave_history": {
+        "label": "Leave History",
+        "columns": {
+            "leave_id": {
+                "type": "INT",
+                "index": True,
+                "label": "Leave ID",
+                "client_permission": {'create': False, 'update': False, 'view': True}
+            },
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "leave_type": {
+                "type": "ENUM('Sick Leave', 'Annual Leave')",
+                "label": "Leave Type"
+            },
+            "leave_start_date": {
+                "type": "DATE",
+                "label": "Leave Start Date"
+            },
+            "leave_end_date": {
+                "type": "DATE",
+                "label": "Leave End Date"
+            },
+            "leave_days": {
+                "type": "INT",
+                "not_null": True,
+                "label": "Leave Days"
+            },
+            "reason": {
+                "type": "STRING(255)",
+                "label": "Reason"
+            }
+        }
+    },
+    "tasks": {
+        "label": "Tasks",
+        "columns": {
+            "task_id": {
+                "type": "INT",
+                "index": True,
+                "label": "Task ID",
+                "client_permission": {'create': False, 'update': False, 'view': True}
+            },
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "assigned_by": {
+                "type": "INT",
+                "label": "Assigned By",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Assigner Name",
+            },
+            "task_description": {
+                "type": "STRING(255)",
+                "label": "Task Description"
+            },
+            "deadline": {
+                "type": "DATE",
+                "label": "Deadline"
+            },
+            "status": {
+                "type": "ENUM('Pending', 'In Progress', 'Completed')",
+                "label": "Status"
+            }
+        }
+    },
+    "task_history": {
+        "label": "Task History",
+        "columns": {
+            "history_id": {
+                "type": "INT",
+                "index": True,
+                "label": "History ID",
+                "client_permission": {'create': False, 'update': False, 'view': True}
+            },
+            "task_id": {
+                "type": "INT",
+                "label": "Task ID",
+                "index": True,
+                "foreign_key": "tasks.task_id|tasks.task_description",
+                "foreign_key_alias": "Task Description",
+            },
+            "emp_no": {
+                "type": "INT",
+                "label": "Employee Number",
+                "index": True,
+                "foreign_key": "employees.emp_no|employees.name",
+                "foreign_key_alias": "Employee Name",
+            },
+            "evaluation_date": {
+                "type": "DATE",
+                "label": "Evaluation Date"
+            },
+            "evaluation_score": {
+                "type": "INT",
+                "label": "Evaluation Score",
+            },
+            "comments": {
+                "type": "STRING(255)",
+                "label": "Comments"
+            }
+        }
     }
 })
+
 

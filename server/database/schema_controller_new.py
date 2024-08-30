@@ -79,7 +79,7 @@ class SchemaControllerNew:
                 if source_column_name == destination_column_name:
                     continue
 
-                source_value = record[source_column_name]
+                source_value = record[foreign_column_name]
                 if unique_values.get(source_value) is None:
                     records[index][foreign_key_alias] = ""
                     continue
@@ -145,10 +145,5 @@ class SchemaControllerNew:
 
         return new_records
 
-    def get_table_config(self, table_name: str):
-        form_config = self.tables[table_name].get_form_config()
-
-        column_order = self.tables[table_name].get_column_order()
-
-        return form_config, column_order
-
+    def get_view_columns(self, table_name: str):
+        return self.tables[table_name].get_view_columns()

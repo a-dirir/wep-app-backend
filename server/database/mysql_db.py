@@ -127,8 +127,12 @@ class MySQLDB:
             if db is None:
                 return False, "Error getting connection"
 
-            keys = ", ".join(row.keys())
-            values = tuple(row.values())
+            if len(row.keys()) == 1:
+                keys = f"{list(row.keys())[0]}"
+                values = f"('{list(row.values())[0]}')"
+            else:
+                keys = ", ".join(row.keys())
+                values = tuple(row.values())
 
             sql = f"INSERT INTO {table_name} ({keys}) VALUES {values}"
 

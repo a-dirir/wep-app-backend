@@ -1,9 +1,7 @@
-import json
 import os
 import datetime
 
-import boto3
-from flask import Flask, request, jsonify, make_response, send_from_directory, session
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from dotenv import load_dotenv
@@ -24,37 +22,10 @@ def load_env():
     load_dotenv("config.env")
 
 
-def load_aws_env():
-    try:
-        secret_name = "crm-backend"
-        region_name = "me-central-1"
-
-        boto3_session = boto3.session.Session()
-        client = boto3_session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
-
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-
-        secret = json.loads(get_secret_value_response["SecretString"])
-
-        for key, value in secret.items():
-            os.environ[key] = str(value)
-
-        return True
-    except Exception as e:
-        return False
-
-
 def setup():
-    success = load_aws_env()
-    if not success:
-        load_env()
+    load_env()
 
-    app_local = Flask(__name__, static_folder="static_files", template_folder="static_files")
+    app_local = Flask(__name__)
     login_manager_local = LoginManager()
     app_local.config.update(
         SECRET_KEY=os.urandom(24),
@@ -102,7 +73,7 @@ def login():
     user_info = {'username': username, 'group': authenticator.get_user_group(username)}
 
     response = make_response(
-        jsonify(msg={'user_info': user_info, 'customers': authenticator.get_customers()})
+        jsonify(msg={'user_info': user_info})
     )
 
     return response
@@ -115,7 +86,7 @@ def status():
         user_info = {'username': current_user.username,
                      'group': authenticator.get_user_group(current_user.username)}
 
-        return jsonify(msg={'user_info': user_info, 'customers': authenticator.get_customers()}), 200
+        return jsonify(msg={'user_info': user_info}), 200
     else:
         return jsonify(msg="Not logged in"), 401
 
@@ -168,36 +139,5 @@ def application():
     return jsonify(msg=msg), status_code
 
 
-@app.route('/test', methods=['POST'])
-def test():
-    try:
-        # load json data from request
-        payload = request.get_json()
-        payload['db'] = db
-        payload['router'] = router
-
-        payload['user'] = {'username': 'ahmed.dirir@bespinglobal.ae', 'group': 'admin'}
-
-        # route the request to the appropriate service, controller and method
-        msg, status_code = router.route(payload)
-
-        # return a flask response object to the client
-        if status_code == 200:
-            logger.info(f"Success: {msg}")
-            return jsonify(msg=msg), status_code
-        else:
-            logger.error(f"Error: {msg}")
-            return jsonify(msg), status_code
-
-    except Exception as e:
-        print(e)
-        logger.error(f"Error: {e}")
-        msg = {'error': 'The server encountered an internal error and was unable to complete your request'}
-        status_code = 500
-
-    return jsonify(msg=msg), status_code
-
-
 if __name__ == '__main__':
     app.run(debug=True, port=80)
-
