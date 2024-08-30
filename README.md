@@ -40,7 +40,7 @@ python -m pip install -r requirements.txt
 ```
 
 ## Configuration
-1. #### MySQL database
+### MySQL database
 Create a file named **config.env** in the same directory root directory of the project.
 
 Enter the MySQL database information in the **config.env** file.
