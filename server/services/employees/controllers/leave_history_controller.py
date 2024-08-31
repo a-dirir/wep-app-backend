@@ -1,10 +1,15 @@
-from server.base.crud_new import CRUDNew
+from server.base.crud import CRUD
 
 
-class LeaveHistory(CRUDNew):
+# LeaveHistory class is a child class of CRUD class
+# It is used to define the LeaveHistory controller
+# It implements the on_create, post_create, and post_delete methods
+# to make sure that the leave balance of the employee is updated when a leave is created or deleted
+# It has no update method, so the leave history cannot be updated, only list, create and delete operations are allowed
+class LeaveHistory(CRUD):
     def __init__(self):
         super().__init__('LeaveHistory')
-        self.methods = ['create', 'list', 'delete', 'showLinkedServices']
+        self.methods = ['create', 'list', 'delete']
 
     def on_create(self, data: dict, db):
         emp_no = data.get('emp_no')

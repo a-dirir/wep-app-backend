@@ -7,6 +7,10 @@ from server.services.tasks.tasks_service import TasksService
 from server.util import get_logger
 
 
+# A router class that routes the request to the appropriate service, controller and method
+# based on the action provided in the request. It also checks if the user is authorized to
+# perform the requested action. If the user is not authorized, it returns an error message.
+# The router logs the request and response for each request.
 class Router:
     def __init__(self):
         self.services = {

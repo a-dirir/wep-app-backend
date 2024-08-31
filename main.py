@@ -12,19 +12,24 @@ from server.database.mysql_db import MySQLDB
 from server.util import get_logger
 
 
+# Below User class is required for flask_login
 class User(UserMixin):
     def __init__(self, _id):
         self.id = _id
         self.username = _id
 
 
-def load_env():
-    load_dotenv("config.env")
+# Load environment variables
+def load_env(env: str = 'local'):
+    if env == 'local':
+        load_dotenv("config.env")
 
 
 def setup():
+    # Load environment variables
     load_env()
 
+    # Create Flask app, LoginManager
     app_local = Flask(__name__)
     login_manager_local = LoginManager()
     app_local.config.update(
@@ -40,6 +45,7 @@ def setup():
 
     cors = CORS(app_local, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
+    # create instance of MySQLDB, Router, Authenticator and Logger
     db_local = MySQLDB()
     router_local = Router()
     authenticator_local = Authenticator(db_local)
@@ -51,13 +57,16 @@ def setup():
 app, login_manager, db, router, authenticator, logger = setup()
 
 
+# Required for flask_login
 @login_manager.user_loader
 def user_loader(username):
     return User(username)
 
 
+# handle login request
 @app.route('/login', methods=['POST'])
 def login():
+    # get username and password from request headers
     username = request.headers.get('username')
     password = request.headers.get('password')
 
@@ -68,8 +77,10 @@ def login():
     if not authenticator.is_authentic(payload):
         return jsonify(msg={'error': 'Invalid username or password'}), 400
 
+    # login user in flask_login
     login_user(User(username), remember=True, duration=datetime.timedelta(seconds=24 * 60 * 60))
 
+    # return user info to client containing username and group
     user_info = {'username': username, 'group': authenticator.get_user_group(username)}
 
     response = make_response(
@@ -79,6 +90,7 @@ def login():
     return response
 
 
+# handle status request that checks if user is logged in
 @login_required
 @app.route('/status', methods=['POST'])
 def status():
@@ -91,10 +103,12 @@ def status():
         return jsonify(msg="Not logged in"), 401
 
 
+# handle logout request
 @app.route("/logout", methods=["POST"])
 @login_required
 def logout():
     if current_user.is_authenticated:
+        # logout user in flask_login
         logout_user()
         response = make_response(jsonify(msg="Logged out successfully"), 200)
         return response
@@ -102,6 +116,8 @@ def logout():
         return jsonify(msg="User is not logged in"), 401
 
 
+# handle application request that routes the request to the appropriate service, controller and method
+# and returns the response to the client
 @app.route('/app', methods=['POST'])
 @login_required
 def application():
@@ -109,7 +125,7 @@ def application():
         if not current_user.is_authenticated:
             return jsonify(msg='User is not authenticated'), 401
 
-        # load json data from request
+        # load json data from request, add db, router and user info to payload
         payload = request.get_json()
         payload['db'] = db
         payload['router'] = router

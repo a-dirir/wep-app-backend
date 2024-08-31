@@ -1,10 +1,13 @@
 import hashlib
 import os
-from server.base.crud_new import CRUDNew
+from server.base.crud import CRUD
 from server.util import get_logger
 
 
-class User(CRUDNew):
+# User controller class is a child class of CRUD class that is used to perform CRUD operations on IAMUser table
+# It is used to define the User controller and its methods
+# It is used to generate credentials for a user
+class User(CRUD):
     def __init__(self):
         self.name = 'IAMUser'
         super().__init__(self.name)

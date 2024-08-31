@@ -1,10 +1,8 @@
-from binascii import hexlify, unhexlify
-from time import time
-from hashlib import sha256
 import logging
 from os import path, getenv
 
 
+# This function is used to get the logger object
 def get_logger(name):
 
     logger = logging.getLogger(name)
@@ -28,25 +26,4 @@ def get_logger(name):
     logger.addHandler(error)
 
     return logger
-
-
-def c2s(msg):
-    return str(hexlify(msg), encoding='utf8')
-
-
-def c2b(msg):
-    return unhexlify(bytes(msg, encoding='utf8'))
-
-
-def get_current_time():
-    return int(time())
-
-
-def get_time_difference(given_time):
-    return int(given_time - time())
-
-
-def hash_msg(msg):
-    return sha256(msg).digest()
-
 

@@ -1,4 +1,4 @@
-controller_db_mappings = {
+controller_db_tables_mappings = {
     'Employees': {
         'Employees': 'employees',
         'Titles': 'titles',

@@ -1,4 +1,7 @@
-
+# Base class for services to inherit from to provide a common interface for handling requests
+# The handle method is used to route the request to the appropriate controller
+# The controller is determined by the controller key in the payload
+# The method is determined by the method key in the payload
 class BaseService:
     def __init__(self):
         self.name = 'BaseService'

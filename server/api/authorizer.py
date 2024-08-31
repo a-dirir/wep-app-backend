@@ -1,5 +1,27 @@
 from server.api.policies import policies
 
+"""
+Class to authorize users based on their group and the access they are trying to perform.
+The policies are defined in the policies.py file. A policy is a dictionary with the following structure:
+{
+    'version': '1.0',
+    'statements': [
+        {
+            'effect': 'allow',
+            'actions': ['service:controller:method'],
+            'resources': ['some resource']
+        },
+        {
+            'effect': 'deny',
+            'actions': ['service:controller:method'],
+            'resources': ['some resource']
+        }
+    ]
+}
+A deny statement will always take precedence over an allow statement. 
+If an action is not defined in an allow policy, the user will not be authorized to perform that action.
+"""
+
 
 class Authorizer:
     def __init__(self):

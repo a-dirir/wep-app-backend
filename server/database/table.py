@@ -7,6 +7,8 @@
 # }
 
 
+# Class Table that is used to store the schema of a table and provide methods to get required and optional columns,
+# get index columns, get view columns, get foreign columns, get labels, get column names from labels
 class Table:
     def __init__(self, table_schema: dict):
         self.table_schema = table_schema
@@ -104,22 +106,3 @@ class Table:
                     break
 
         return column_names
-
-    def get_column_order(self):
-        return self.table_schema['column_order']
-
-    def get_form_config(self):
-        view_columns = self.get_view_columns()
-        form_config = {}
-
-        for column_name, column_properties in self.table_schema['columns'].items():
-            if column_name not in view_columns:
-                continue
-
-            form_config[column_properties['label']] = {
-                'type': column_properties['type'],
-                'permission': column_properties.get('client_permission', {'create': False,
-                                                                          'edit': False, 'view': True}),
-            }
-
-        return form_config

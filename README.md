@@ -1,48 +1,58 @@
 # 🛠️ Internal Portal Web Application Backend
 
-## 📋 Introduction
+## Introduction
 Welcome to the backend of the **Internal Portal Web Application**—a robust platform that centralizes and streamlines various business operations within the organization. By integrating multiple data sources, this backend service enables efficient data access, management, and analysis. The frontend counterpart of this application can be found [here](https://github.com/a-dirir/wep-app-frontend).
 
-## 🚀 Installation
+## Installation
 
 To get started with the backend setup, follow these steps:
 
 1. **Navigate to the Backend Directory:**
    ```bash
    cd wep-app-backend
-
+   ```
 2. **Create a virtual environment:**
 
-    #### Linux
+    **Linux**
+
     ```bash
     python3 -m venv .venv 
     ```
-    #### Windows
+   
+    **Windows**
+
     ```bash
     python -m venv .venv
     ```
+   
 3. **Activate the virtual environment:**
 
-    #### Linux
+    **Linux**
+
     ```bash
     source .venv/bin/activate  
     ```
-    #### Windows
+   
+    **Windows**
+
     ```bash
     .venv\Scripts\activate
     ```
 4. **Install the required package:**
 
-    #### Linux
+    **Linux**
+
     ```bash
     python3 -m pip install -r requirements.txt
     ```
-    #### Windows
+   
+    **Windows**
+
     ```bash
     python -m pip install -r requirements.txt
     ```
 
-## ⚙️ Configuration
+## Configuration
 ### MySQL Database Setup
 
 1. Create a file named config.env in the root directory of the project.
@@ -55,15 +65,18 @@ To get started with the backend setup, follow these steps:
     MYSQL_DATABASE_NAME=yyyy
     ```
 
-## ▶️ Running the Web Application
+## Running the Web Application
 To run the Web Application, you need to run the **main.py** file.
 
-#### Linux
-```bash
-python3 main.py
-```
-#### Windows
-```bash
-python main.py
-```
+   **Linux**
+
+   ```bash
+   python3 main.py
+   ```
+
+   **Windows**
+
+   ```bash
+   python main.py
+   ```
 

@@ -1,72 +1,80 @@
-from server.util import get_logger
-from server.database.schema import schema
-from server.base.controller import BaseController
 from server.database.schema_controller import SchemaController
-from server.base.mappings import controller_db_mappings
+from server.util import get_logger
+from server.base.controller import BaseController
+from server.base.mappings import controller_db_tables_mappings
 
 
+# class used in create, read, update, delete operations, CRUD stands for Create, Read, Update, Delete.
+# it used in many services as performing CRUD operations is common in many services
+# it also has on_create, post_create, on_update, post_update, on_delete, post_delete methods
+# which can be overridden in the service to perform custom operations before and after CRUD operations
 class CRUD(BaseController):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
-        self.methods = ['create', 'list', 'update', 'delete', 'showLinkedServices']
+        self.methods = ['create', 'list', 'update', 'delete']
         self.logger = get_logger(f"CRUD_{name}")
 
-        self.schema = schema
         self.schema_controller = SchemaController()
 
-        self.index_keys = {}
-        self.foreign_keys = {}
-        self.columns_permissions = {}
+    def prepare_results(self, results: list, payload: dict):
+        db = payload['db']
 
-        self.controller_db_mappings = controller_db_mappings
+        table_name = controller_db_tables_mappings[payload['service']][payload['controller']]
 
-        self.load_table_metadata()
+        if len(results) > 3:
+            records = None
+        elif 0 < len(results) <= 3:
+            records = results
+        else:
+            return False, {'error': f"No data found for {payload['controller']}"}
 
-    def load_table_metadata(self):
-        for table_name in self.schema.keys():
-            self.index_keys[table_name] = self.schema_controller.get_index_keys(table_name)
-            self.foreign_keys[table_name] = self.schema_controller.get_foreign_keys(table_name)
-            self.columns_permissions[table_name] = self.schema_controller.get_columns_permissions(table_name)
+        # get foreign columns unique values
+        success, foreign_columns_data = self.schema_controller.get_foreign_columns_data(table_name, db, records)
+        if not success:
+            return {'error': f"Error in listing {payload['controller']}"}, 400
 
-    def validate_data(self, table_name: str, row: dict):
-        for column_name, column in self.schema[table_name]['columns'].items():
-            if column.get('not_null', False) and row.get(column_name) is None:
-                return False, f'{column_name} is missing'
+        # join foreign columns unique values with rows
+        data, options = self.schema_controller.join_records_and_foreign_columns(results, foreign_columns_data)
 
-        return True, row
+        return True, {'data': data, 'options': options}
 
     def list(self, payload: dict):
         db = payload['db']
 
-        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
+        table_name = controller_db_tables_mappings[payload['service']][payload['controller']]
 
-        success, rows = db.get(table_name=table_name)
+        view_columns = self.schema_controller.tables[table_name].get_view_columns()
+
+        # get rows of table
+        success, rows = db.get(table_name=table_name, columns=view_columns)
         if not success:
             return {'error': f"Error in listing {payload['controller']}"}, 400
+
         self.logger.info(f"Success: get rows of {table_name}")
 
-        success, foreign_keys_aliases = self.schema_controller.get_foreign_keys_aliases(self.foreign_keys[table_name], db)
+        success, results = self.prepare_results(rows, payload)
         if not success:
-            return {'error': f"Error in listing {payload['controller']}"}, 400
-        self.logger.info(f"Success: get foreign keys aliases for {table_name}")
+            return results, 400
 
-        return {'data': rows, 'columns_aliases': foreign_keys_aliases}, 200
+        return {'data': results['data'], 'options': results['options']}, 200
 
     def create(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
-
-        data = self.schema_controller.remove_extra_columns(data, self.columns_permissions[table_name]['create'])
         if data is None or len(data) == 0:
-            return {'error': 'No data to insert'}, 400
+            return {'error': 'No data to create'}, 400
 
-        data = self.on_create(data, db)
+        table_name = controller_db_tables_mappings[payload['service']][payload['controller']]
 
-        # validate data
-        success, data = self.validate_data(table_name, data)
+        # ensure client supplied required fields
+        input_data = data.get('input_data')
+        success, input_data = self.schema_controller.validate_input_data(table_name, input_data)
+        if not success:
+            return {'error': input_data}, 400
+
+        success, data = self.on_create(input_data, db)
         if not success:
             return {'error': data}, 400
 
@@ -74,65 +82,74 @@ class CRUD(BaseController):
         success, results = db.insert(table_name=table_name, row=data)
         if not success:
             return {'error': results}, 400
+
         self.logger.info(f"Success: insert row in {table_name}")
 
-        results = [{col: data[col] for col in self.columns_permissions[table_name]['view']}]
+        success, data = self.post_create(data, db)
+        if not success:
+            return {'error': data}, 400
 
-        return {'data': results}, 200
+        # get the newly created row
+        success, data = db.get(table_name=table_name, where_items=[data])
+        if not success:
+            return {'error': data}, 400
 
-    def prepare_update_data(self, table_name: str, data: dict):
-        if data.get('new') is None or data.get('old') is None:
-            return False, 'new and old data are required'
 
-        data['new'] = self.schema_controller.remove_extra_columns(data['new'],
-                                                                  self.columns_permissions[table_name]['view'])
-        data['old'] = self.schema_controller.remove_extra_columns(data['old'],
-                                                                  self.columns_permissions[table_name]['view'])
+        success, results = self.prepare_results([data[0]], payload)
+        if not success:
+            return results, 400
 
-        if data['new'] is None or len(data['new']) == 0:
-            return False, 'No new data to update'
-
-        if data['old'] is None or len(data['old']) == 0:
-            return False, 'No old data to update'
-
-        for key in self.index_keys[table_name]:
-            if data['old'].get(key) is None:
-                return False, f'{key} is missing in old data'
-
-        conditions = {key: data['old'][key] for key in self.index_keys[table_name]}
-
-        return True, {'conditions': conditions, 'data': data['new']}
+        return {'data': {'New Record': results['data'][0]}}, 200
 
     def update(self, payload: dict):
         data = payload['data']
         db = payload['db']
 
-        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
+        if data is None or len(data) == 0:
+            return {'error': 'No data to update'}, 400
 
-        success, result = self.prepare_update_data(table_name, data)
+        table_name = controller_db_tables_mappings[payload['service']][payload['controller']]
+
+        # ensure client supplied required fields for index data used for update
+        index_data = data.get('index_data')
+        success, condition = self.schema_controller.validate_index_data(table_name, index_data)
         if not success:
-            return {'error': result}, 400
+            return {'error': condition}, 400
 
-        conditions = result['conditions']
-        data = result['data']
-
-        data = self.on_update(data, db)
-
-        # validate data
-        success, data = self.validate_data(table_name, data)
+        # check if there are data to update in the table
+        success, old_records = db.get(table_name=table_name, where_items=[condition])
         if not success:
-            return {'error': data}, 400
+            return {'error': old_records}, 400
+        elif len(old_records) == 0:
+            return {'error': 'No record found to update'}, 400
+
+        # ensure client supplied required fields for input data used for update
+        input_data = data.get('input_data')
+        success, input_data = self.schema_controller.validate_input_data(table_name, input_data, 'update')
+        if not success:
+            return {'error': input_data}, 400
+
+        success, data = self.on_update(input_data, db)
 
         # update row in table
-        success, results = db.update(table_name=table_name, row=data, where_items=[conditions])
+        success, results = db.update(table_name=table_name, row=data, where_items=[condition])
         if not success:
             return {'error': results}, 400
 
         self.logger.info(f"Success: update row in {table_name}")
 
-        results = [{col: data[col] for col in self.columns_permissions[table_name]['view']}]
+        success, data = self.post_update(data, db)
 
-        return {'data': results}, 200
+        # combine condition and input data to get updated row
+        for key, value in condition.items():
+            if key not in data:
+                data[key] = value
+
+        success, results = self.prepare_results([old_records[0], data], payload)
+        if not success:
+            return results, 400
+
+        return {'data': {'Old Record': results['data'][0], 'New Record': results['data'][1]}}, 200
 
     def delete(self, payload: dict):
         data = payload['data']
@@ -141,56 +158,60 @@ class CRUD(BaseController):
         if data is None or len(data) == 0:
             return {'error': 'No data to delete'}, 400
 
-        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
+        table_name = controller_db_tables_mappings[payload['service']][payload['controller']]
 
-        for key in self.index_keys[table_name]:
-            if data.get(key) is None:
-                return {'error': f'{key} is missing'}, 400
+        # ensure client supplied required fields for index data used for update
+        index_data = data.get('index_data')
+        success, condition = self.schema_controller.validate_index_data(table_name, index_data)
+        if not success:
+            return {'error': condition}, 400
 
-        conditions = {key: data[key] for key in self.index_keys[table_name]}
+        # check if there are data to delete in the table
+        success, records_to_delete = db.get(table_name=table_name, where_items=[condition])
+        if not success:
+            return {'error': records_to_delete}, 400
+        elif len(records_to_delete) == 0:
+            return {'error': 'No record found to delete'}, 400
 
-        success, results = db.delete(table_name=table_name, where_items=[conditions])
+        success, records_to_delete = self.on_delete(records_to_delete, db)
+        if not success:
+            return {'error': records_to_delete}, 400
+
+        success, results = db.delete(table_name=table_name, where_items=[condition])
+        if not success:
+            return {'error': results}, 400
+
+        success, results = self.post_delete(records_to_delete, db)
         if not success:
             return {'error': results}, 400
 
         self.logger.info(f"Success: delete row in {table_name}")
 
-        return results, 200
+        success, results = self.prepare_results(records_to_delete, payload)
+        if not success:
+            return results, 400
+
+        return {'data': {'Deleted Records': results['data']}}, 200
 
     def on_create(self, data: dict, db):
-        return data
+        return True, data
+
+    def post_create(self, data: dict, db):
+        return True, data
 
     def on_update(self, data: dict, db):
-        return data
+        return True, data
 
-    def showLinkedServices(self, payload: dict):
-        data = payload['data']
-        db = payload['db']
+    def post_update(self, data: dict, db):
+        return True, data
 
-        if data is None or len(data) == 0:
-            return {'error': 'No data to show Linked Services for..'}, 400
+    def on_delete(self, data: list, db):
+        return True, data
 
-        table_name = self.controller_db_mappings[payload['service']][payload['controller']]
+    def post_delete(self, data: list, db):
+        return True, data
 
-        for key in self.index_keys[table_name]:
-            if data.get(key) is None:
-                return {'error': f'{key} is missing'}, 400
 
-        conditions = {key: data[key] for key in self.index_keys[table_name]}
 
-        # get full row
-        success, results = db.get(table_name=table_name, where_items=[conditions])
-        if not success:
-            return {'error': results}, 400
 
-        updated_data = results[0]
 
-        # get linked records
-        success, results = self.schema_controller.get_linked_records(table_name, updated_data, self.foreign_keys,
-                                                                     self.columns_permissions, db)
-        if not success:
-            return {'error': results}, 400
-
-        self.logger.info(f"Success: get linked records in {table_name}")
-
-        return results, 200

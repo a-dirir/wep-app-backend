@@ -1,15 +1,16 @@
 from server.base.controller import BaseController
 from server.database.schema import schema
-from server.database.schema_controller_new import SchemaControllerNew
-from server.base.mappings import controller_db_mappings
+from server.database.schema_controller import SchemaController
+from server.base.mappings import controller_db_tables_mappings
 
 
+# The RecordsLinker controller is used to list all the records linked to a record in db
 class RecordsLinker(BaseController):
     def __init__(self):
         super().__init__()
         self.methods = ['list']
         self.dependency_graph = self.build_dependencies_graph()
-        self.schema_controller = SchemaControllerNew()
+        self.schema_controller = SchemaController()
 
     @staticmethod
     def build_dependency_mapping():
@@ -95,13 +96,13 @@ class RecordsLinker(BaseController):
 
         service, controller = resource.split(':')
 
-        if service not in controller_db_mappings:
+        if service not in controller_db_tables_mappings:
             return {'error': f"Service {service} not found in mappings"}, 400
 
-        if controller not in controller_db_mappings[service]:
+        if controller not in controller_db_tables_mappings[service]:
             return {'error': f"Controller {controller} not found in mappings"}, 400
 
-        table_name = controller_db_mappings[service][controller]
+        table_name = controller_db_tables_mappings[service][controller]
 
         view_columns = self.schema_controller.tables[table_name].get_view_columns()
 

@@ -6,6 +6,8 @@ from server.util import get_logger
 from os import environ
 
 
+# MySQLDB class to interact with MySQL database using connection pool
+# it has methods to get, insert, update, delete rows from tables
 class MySQLDB:
     def __init__(self):
         self.logger = get_logger(__class__.__name__)

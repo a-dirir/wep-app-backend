@@ -2,6 +2,7 @@ import hashlib
 from server.util import get_logger
 
 
+# class to authenticate users using username and password, and return their group.
 class Authenticator:
     def __init__(self, db):
         self.table_name = 'iam_users'

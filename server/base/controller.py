@@ -1,5 +1,6 @@
-
-
+# Base class for controllers to inherit from to provide a common interface for handling requests
+# The handle method is used to route the request to the appropriate method
+# The method is determined by the method parameter
 class BaseController:
     def __init__(self):
         self.name = 'BaseController'
